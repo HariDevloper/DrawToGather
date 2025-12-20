@@ -11,6 +11,7 @@ import Social from './components/Social';
 import RoomPlayers from './components/RoomPlayers';
 import Notifications from './components/Notifications';
 import Toast from './components/Toast';
+import SystemDiagnostics from './components/SystemDiagnostics';
 import './App.css';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -461,16 +462,20 @@ function App() {
     return (
       <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
         <Auth onLogin={(userData) => setUser(userData)} />
+        <SystemDiagnostics />
       </GoogleOAuthProvider>
     );
   }
 
   if (!user.isProfileComplete) {
     return (
-      <Onboarding
-        user={user}
-        onComplete={(updatedUser) => setUser(updatedUser)}
-      />
+      <>
+        <Onboarding
+          user={user}
+          onComplete={(updatedUser) => setUser(updatedUser)}
+        />
+        <SystemDiagnostics />
+      </>
     );
   }
 
