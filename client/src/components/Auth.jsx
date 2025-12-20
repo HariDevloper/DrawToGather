@@ -5,7 +5,8 @@ import { GoogleLogin } from '@react-oauth/google';
 import { Sun } from 'lucide-react';
 import './Auth.css';
 
-const API_URL = 'http://localhost:5000/api/auth';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = `${BASE_URL}/api/auth`;
 
 const Auth = ({ onLogin }) => {
     const [error, setError] = useState('');
