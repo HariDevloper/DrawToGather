@@ -16,17 +16,43 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
+        origin: "*", // Allow all for troubleshooting
+        methods: ["GET", "POST"],
+        credentials: true
     }
 });
 
-app.use(cors());
+app.use(cors({
+    origin: "*", // Allow all for troubleshooting
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true
+}));
 app.use(express.json());
 
 app.use('/api/users', userRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/auth', authRoutes);
+
+app.get('/', (req, res) => {
+    res.send('DrawToGather Server is Running! 🚀');
+});
+
+// Health Check Endpoint
+app.get('/api/health', (req, res) => {
+    const dbState = mongoose.connection.readyState;
+    const dbStatus = {
+        0: 'Disconnected',
+        1: 'Connected',
+        2: 'Connecting',
+        3: 'Disconnecting'
+    };
+    res.json({
+        server: 'Online',
+        database: dbStatus[dbState] || 'Unknown',
+        timestamp: new Date(),
+        uptime: process.uptime()
+    });
+});
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
