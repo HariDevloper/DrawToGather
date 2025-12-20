@@ -5,7 +5,9 @@ import { X, LogOut, Check, User as UserIcon } from 'lucide-react';
 import './ProfileModal.css';
 
 const AVATARS = Array.from({ length: 10 }, (_, i) => `avatar${i + 1}.png`);
-const API_URL = 'http://localhost:5000/api/users';
+import { API_URL as BASE_API_URL } from '../config';
+
+const API_URL = `${BASE_API_URL}/users`;
 
 const ProfileModal = ({ user, onClose, onUpdate, onLogout }) => {
     const [username, setUsername] = useState(user.username);

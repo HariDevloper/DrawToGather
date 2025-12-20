@@ -14,9 +14,9 @@ import Toast from './components/Toast';
 import SystemDiagnostics from './components/SystemDiagnostics';
 import './App.css';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://drawtogather-backend.onrender.com';
-const API_URL = `${BASE_URL}/api`;
-const socket = io(BASE_URL);
+import { API_URL, SOCKET_URL } from './config';
+
+const socket = io(SOCKET_URL);
 
 function App() {
   const canvasRef = useRef(null);

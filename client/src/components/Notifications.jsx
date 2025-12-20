@@ -4,8 +4,10 @@ import io from 'socket.io-client';
 import { Bell, Check, X, Copy, LogIn } from 'lucide-react';
 import './Notifications.css';
 
-const API_URL = 'http://localhost:5000/api/users';
-const socket = io('http://localhost:5000');
+import { API_URL as BASE_API_URL, SOCKET_URL } from '../config';
+
+const API_URL = `${BASE_API_URL}/users`;
+const socket = io(SOCKET_URL);
 
 const Notifications = ({ user, onUpdateUser, onJoinRoom }) => {
     const [notifications, setNotifications] = useState([]);

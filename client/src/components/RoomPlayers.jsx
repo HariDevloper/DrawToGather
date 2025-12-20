@@ -3,7 +3,9 @@ import axios from 'axios';
 import { Users, UserPlus, UserCheck } from 'lucide-react';
 import './RoomPlayers.css';
 
-const API_URL = 'http://localhost:5000/api/users';
+import { API_URL as BASE_API_URL } from '../config';
+
+const API_URL = `${BASE_API_URL}/users`;
 
 const RoomPlayers = ({ roomId, currentUserId }) => {
     const [players, setPlayers] = useState([]);

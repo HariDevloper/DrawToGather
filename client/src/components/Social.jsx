@@ -3,7 +3,9 @@ import axios from 'axios';
 import { Search, UserPlus, Check, X, Users, MessageCircle, LogIn, UserMinus, RefreshCw } from 'lucide-react';
 import './Social.css';
 
-const API_URL = 'http://localhost:5000/api/users';
+import { API_URL as BASE_API_URL } from '../config';
+
+const API_URL = `${BASE_API_URL}/users`;
 
 const Social = ({ user, onUpdateUser, onJoinFriend, onOpenChat }) => {
     const [searchQuery, setSearchQuery] = useState('');
