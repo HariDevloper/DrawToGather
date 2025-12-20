@@ -89,7 +89,11 @@ router.post('/google', async (req, res) => {
 
     } catch (err) {
         console.error('Google Auth Error:', err);
-        res.status(401).json({ message: 'Invalid Google Token' });
+        // Log detailed error for debugging
+        if (err.message.includes('audience')) {
+            console.error('AUDIENCE MISMATCH! Expected:', process.env.GOOGLE_CLIENT_ID);
+        }
+        res.status(401).json({ message: 'Invalid Google Token', error: err.message });
     }
 });
 
