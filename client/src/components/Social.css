@@ -1,0 +1,352 @@
+.social-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.social-search {
+    margin-bottom: 20px;
+}
+
+.search-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #FFFBEA;
+    border: 4px solid #FFD93D;
+    border-radius: 20px;
+    padding: 12px 18px;
+    box-shadow: 0 4px 0 #F4C430;
+}
+
+.search-input-wrapper svg {
+    color: #F4C430;
+    flex-shrink: 0;
+}
+
+.search-input-wrapper input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2C2C2C;
+    font-family: 'Poppins', sans-serif;
+}
+
+.search-input-wrapper input::placeholder {
+    color: #999;
+}
+
+.social-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.empty-social {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.empty-social p {
+    font-size: 1.1rem;
+    color: #5A5A5A;
+    font-weight: 600;
+}
+
+.social-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #FFFBEA;
+    border: 4px solid #FFD93D;
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 #F4C430;
+}
+
+.social-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #F4C430;
+    border-color: #FF9A3D;
+}
+
+.social-avatar {
+    width: 50px;
+    height: 50px;
+    background: #FFD93D;
+    border: 3px solid #F4C430;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+    box-shadow: 0 3px 0 #F4C430;
+}
+
+.social-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.social-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2C2C2C;
+}
+
+.friend-badge {
+    display: inline-block;
+    background: #4CAF50;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    width: fit-content;
+}
+
+.request-badge {
+    display: inline-block;
+    background: #FF9A3D;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    width: fit-content;
+}
+
+.social-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-friend-btn {
+    background: #FFD93D;
+    color: #2C2C2C;
+    border: 3px solid #F4C430;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 4px 0 #F4C430;
+}
+
+.add-friend-btn:hover {
+    background: #FF9A3D;
+    border-color: #E88A2D;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #E88A2D;
+}
+
+.accept-btn {
+    background: #4CAF50;
+    color: white;
+    border: 3px solid #3D8B40;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 #3D8B40;
+}
+
+.accept-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #3D8B40;
+}
+
+.reject-btn {
+    background: #FF6B6B;
+    color: white;
+    border: 3px solid #E85555;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 #E85555;
+}
+
+.reject-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #E85555;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    width: fit-content;
+    margin-top: 2px;
+}
+
+.status-badge.online {
+    background: #E8F5E9;
+    color: #2E7D32;
+    border: 1px solid #C8E6C9;
+}
+
+.status-badge.offline {
+    background: #EEEEEE;
+    color: #757575;
+    border: 1px solid #E0E0E0;
+}
+
+.status-badge.playing {
+    background: #EDE7F6;
+    color: #673AB7;
+    border: 1px solid #D1C4E9;
+}
+
+.invite-btn {
+    background: #6C63FF;
+    color: white;
+    border: 3px solid #5A52E0;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 #5A52E0;
+}
+
+.invite-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #5A52E0;
+    background: #5A52E0;
+}
+
+.chat-btn {
+    background: #00BCD4;
+    color: white;
+    border: 3px solid #00A5BB;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 #00A5BB;
+}
+
+.chat-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #00A5BB;
+    background: #00A5BB;
+}
+
+.remove-friend-btn {
+    background: #FF6B6B;
+    color: white;
+    border: 3px solid #E85555;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 #E85555;
+}
+
+.remove-friend-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #E85555;
+    background: #E85555;
+}
+
+.social-section {
+    margin-bottom: 25px;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2C2C2C;
+    margin-bottom: 15px;
+    padding-left: 5px;
+    border-left: 5px solid #FFD93D;
+    padding-left: 12px;
+}
+
+.join-btn {
+    background: #4CAF50;
+    color: white;
+    border: 3px solid #3D8B40;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 #3D8B40;
+}
+
+.join-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #3D8B40;
+    background: #3D8B40;
+}
+
+.join-btn.disabled,
+.join-btn:disabled {
+    background: #CCCCCC;
+    border-color: #999999;
+    box-shadow: 0 3px 0 #999999;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.room-badge {
+    display: inline-block;
+    background: #6C63FF;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.refresh-icon-btn {
+    background: transparent;
+    border: none;
+    color: #5A5A5A;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.refresh-icon-btn:hover {
+    background: #FFE5A3;
+    color: #2C2C2C;
+    transform: rotate(90deg);
+}

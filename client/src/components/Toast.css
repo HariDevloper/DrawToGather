@@ -1,0 +1,99 @@
+.toast-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+}
+
+.toast {
+    background: white;
+    border: 4px solid #FFD93D;
+    border-radius: 20px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    animation: slideIn 0.3s ease-out;
+    min-width: 300px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.toast-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.toast-friend_request .toast-icon {
+    background: #FFD93D;
+    color: #2C2C2C;
+}
+
+.toast-invite .toast-icon {
+    background: #6C63FF;
+    color: white;
+}
+
+.toast-join .toast-icon {
+    background: #4CAF50;
+    color: white;
+}
+
+.toast-leave .toast-icon {
+    background: #FF6B6B;
+    color: white;
+}
+
+.toast-success .toast-icon {
+    background: #4CAF50;
+    color: white;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-message {
+    margin: 0;
+    font-weight: 600;
+    color: #2C2C2C;
+    font-size: 0.95rem;
+}
+
+.toast-close {
+    background: transparent;
+    border: none;
+    color: #5A5A5A;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.toast-close:hover {
+    background: #FFE5A3;
+    color: #2C2C2C;
+}

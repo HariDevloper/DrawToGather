@@ -1,0 +1,226 @@
+.notification-bell {
+    position: relative;
+    background: #FFD93D;
+    border: 4px solid #F4C430;
+    padding: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2C2C2C;
+    transition: all 0.2s;
+    box-shadow: 0 4px 0 #F4C430;
+}
+
+.notification-bell:hover {
+    background: #FF9A3D;
+    border-color: #E88A2D;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #E88A2D;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #FF6B6B;
+    color: white;
+    border: 3px solid white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.notifications-panel {
+    position: fixed;
+    right: 20px;
+    top: 100px;
+    width: 350px;
+    max-height: calc(100vh - 140px);
+    background: white;
+    border: 4px solid #FFD93D;
+    border-radius: 25px;
+    box-shadow: 0 8px 0 #F4C430;
+    overflow: hidden;
+    z-index: 1500;
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    background: #FFD93D;
+    border-bottom: 4px solid #F4C430;
+}
+
+.notifications-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2C2C2C;
+}
+
+.close-notifications {
+    background: transparent;
+    border: none;
+    color: #2C2C2C;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    transition: transform 0.2s;
+}
+
+.close-notifications:hover {
+    transform: scale(1.2);
+}
+
+.notifications-list {
+    padding: 15px;
+    max-height: calc(100vh - 240px);
+    overflow-y: auto;
+}
+
+.empty-notifications {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.empty-notifications p {
+    color: #5A5A5A;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.notification-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    background: #FFFBEA;
+    border: 3px solid #FFD93D;
+    border-radius: 18px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+}
+
+.notification-item:hover {
+    background: #FFF4A3;
+    transform: translateX(-3px);
+}
+
+.notif-avatar {
+    width: 45px;
+    height: 45px;
+    background: #FFD93D;
+    border: 3px solid #F4C430;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+}
+
+.notif-content {
+    flex: 1;
+}
+
+.notif-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #2C2C2C;
+}
+
+.notif-content strong {
+    font-weight: 700;
+    color: #2C2C2C;
+}
+
+.room-id-badge {
+    display: inline-block;
+    background: #FF9A3D;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: 5px;
+}
+
+.notif-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.accept-notif-btn,
+.reject-notif-btn,
+.join-notif-btn,
+.copy-notif-btn {
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    border: 3px solid;
+    box-shadow: 0 3px 0;
+}
+
+.accept-notif-btn {
+    background: #4CAF50;
+    border-color: #3D8B40;
+    color: white;
+    box-shadow: 0 3px 0 #3D8B40;
+}
+
+.accept-notif-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #3D8B40;
+}
+
+.reject-notif-btn {
+    background: #FF6B6B;
+    border-color: #E85555;
+    color: white;
+    box-shadow: 0 3px 0 #E85555;
+}
+
+.reject-notif-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #E85555;
+}
+
+.join-notif-btn {
+    background: #FFD93D;
+    border-color: #F4C430;
+    color: #2C2C2C;
+    box-shadow: 0 3px 0 #F4C430;
+}
+
+.join-notif-btn:hover {
+    background: #FF9A3D;
+    border-color: #E88A2D;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #E88A2D;
+}
+
+.copy-notif-btn {
+    background: #FFF4A3;
+    border-color: #FFD93D;
+    color: #2C2C2C;
+    box-shadow: 0 3px 0 #FFD93D;
+}
+
+.copy-notif-btn:hover {
+    background: #FFD93D;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #F4C430;
+}
