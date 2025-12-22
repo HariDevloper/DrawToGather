@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Calendar, Check, ArrowRight, ArrowLeft, Heart } from 'lucide-react';
+import { User, Calendar, Check, ArrowRight, ArrowLeft, Globe } from 'lucide-react';
 import axios from 'axios';
 import './Onboarding.css';
 
@@ -9,17 +9,39 @@ import { API_URL as BASE_API_URL } from '../config';
 const API_URL = `${BASE_API_URL}/users`;
 const AVATARS = Array.from({ length: 10 }, (_, i) => `avatar${i + 1}.png`);
 
+import { COUNTRIES } from '../data/countries';
+
 const Onboarding = ({ user, onComplete }) => {
-    // 1: Username, 2: Age, 3: Gender, 4: Avatar
+    // 1: Username, 2: Age, 3: Gender, 4: Country, 5: Avatar
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         username: user.username || '',
         age: '',
         gender: '',
+        country: '',
+        timezone: '',
         avatar: 'avatar1.png'
     });
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+        // Try to auto-detect timezone on mount
+        try {
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (tz) {
+                setFormData(prev => ({ ...prev, timezone: tz }));
+            }
+        } catch (e) {
+            console.log('Timezone detection failed', e);
+        }
+    }, []);
+
+    // Filter countries
+    const filteredCountries = COUNTRIES.filter(c =>
+        c.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const handleNext = () => {
         if (step === 1) {
@@ -51,6 +73,13 @@ const Onboarding = ({ user, onComplete }) => {
             }
             setError('');
             setStep(4);
+        } else if (step === 4) {
+            if (!formData.country) {
+                setError('Please select your country');
+                return;
+            }
+            setError('');
+            setStep(5);
         } else {
             handleSubmit();
         }
@@ -97,7 +126,8 @@ const Onboarding = ({ user, onComplete }) => {
                         {step === 1 && "What's your name?"}
                         {step === 2 && "How old are you?"}
                         {step === 3 && "What's your gender?"}
-                        {step === 4 && "Choose your look"}
+                        {step === 4 && "Where are you from?"}
+                        {step === 5 && "Choose your look"}
                     </h2>
                     <div className="step-indicator">
                         <div className={`step-dot ${step >= 1 ? 'active' : ''}`}>1</div>
@@ -107,6 +137,8 @@ const Onboarding = ({ user, onComplete }) => {
                         <div className={`step-dot ${step >= 3 ? 'active' : ''}`}>3</div>
                         <div className="step-line"></div>
                         <div className={`step-dot ${step >= 4 ? 'active' : ''}`}>4</div>
+                        <div className="step-line"></div>
+                        <div className={`step-dot ${step >= 5 ? 'active' : ''}`}>5</div>
                     </div>
                 </div>
 
@@ -195,6 +227,58 @@ const Onboarding = ({ user, onComplete }) => {
                                 initial={{ x: 20, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
                                 exit={{ x: -20, opacity: 0 }}
+                                className="form-step"
+                            >
+                                <p style={{ color: '#666', marginBottom: '15px', fontSize: '0.9rem' }}>This helps us give you credits at the right local time!</p>
+                                <div className="input-group">
+                                    <label>Select your Country</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Search country..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="country-search-input"
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px 15px',
+                                            borderRadius: '12px',
+                                            border: '2px solid #eee',
+                                            marginBottom: '10px',
+                                            fontSize: '1rem',
+                                            outline: 'none'
+                                        }}
+                                    />
+                                    <div className="countries-grid">
+                                        {filteredCountries.map(c => (
+                                            <button
+                                                key={c.code}
+                                                className={`country-option ${formData.country === c.name ? 'selected' : ''}`}
+                                                onClick={() => {
+                                                    const newTz = formData.timezone || c.timezone;
+                                                    setFormData({ ...formData, country: c.name, timezone: newTz });
+                                                }}
+                                            >
+                                                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <span style={{ fontSize: '1.2rem' }}>{c.flag}</span>
+                                                    {c.name}
+                                                </span>
+                                                {formData.country === c.name && <Check size={16} />}
+                                            </button>
+                                        ))}
+                                        {filteredCountries.length === 0 && (
+                                            <p style={{ gridColumn: '1/-1', textAlign: 'center', color: '#999', padding: '20px' }}>No countries found</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {step === 5 && (
+                            <motion.div
+                                key="step5"
+                                initial={{ x: 20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                exit={{ x: -20, opacity: 0 }}
                                 className="avatar-step"
                             >
                                 <div className="preview-large">
@@ -226,8 +310,8 @@ const Onboarding = ({ user, onComplete }) => {
                         </button>
                     )}
                     <button className="next-btn" onClick={handleNext} disabled={isLoading}>
-                        {isLoading ? 'Saving...' : (step === 4 ? 'Get Started!' : 'Next Step')}
-                        {!isLoading && step !== 4 && <ArrowRight size={20} />}
+                        {isLoading ? 'Saving...' : (step === 5 ? 'Get Started!' : 'Next Step')}
+                        {!isLoading && step !== 5 && <ArrowRight size={20} />}
                     </button>
                 </div>
             </motion.div>

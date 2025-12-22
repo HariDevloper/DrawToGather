@@ -5,8 +5,8 @@ import { GoogleLogin } from '@react-oauth/google';
 import { Sun } from 'lucide-react';
 import './Auth.css';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://drawtogather-backend.onrender.com';
-const API_URL = `${BASE_URL}/api/auth`;
+import { API_URL as BASE_API_URL } from '../config';
+const API_URL = `${BASE_API_URL}/auth`;
 
 const Auth = ({ onLogin }) => {
     const [error, setError] = useState('');

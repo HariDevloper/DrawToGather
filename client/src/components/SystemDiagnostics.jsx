@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Activity, Database, Server, Wifi, RefreshCw, X, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_URL as BASE_API_URL } from '../config';
+const API_URL = BASE_API_URL.replace('/api', '');
 
 const SystemDiagnostics = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +15,6 @@ const SystemDiagnostics = () => {
         lastChecked: null
     });
 
-    const API_URL = import.meta.env.VITE_API_URL || 'https://drawtogather-backend.onrender.com';
     const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
     const runDiagnostics = async () => {

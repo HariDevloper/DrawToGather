@@ -2,7 +2,53 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    max-height: 100%;
+    padding: 20px;
+    gap: 0;
     overflow: hidden;
+}
+
+.social-loading,
+.social-error {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+}
+
+.social-loading p,
+.social-error p {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #FF9A3D;
+    margin-bottom: 20px;
+}
+
+.social-error p {
+    color: #FF6B6B;
+}
+
+.retry-btn {
+    background: #FFD93D;
+    border: 3px solid #F4C430;
+    color: #2C2C2C;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #F4C430;
+    transition: all 0.2s;
+}
+
+.retry-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #F4C430;
 }
 
 .social-search {
@@ -77,8 +123,8 @@
 }
 
 .social-avatar {
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     background: #FFD93D;
     border: 3px solid #F4C430;
     border-radius: 50%;
@@ -279,7 +325,31 @@
 }
 
 .social-section {
-    margin-bottom: 25px;
+    flex: 1;
+    min-height: 200px;
+    overflow-y: scroll !important;
+    overflow-x: hidden;
+    padding-right: 10px;
+}
+
+/* Make scrollbar more visible */
+.social-section::-webkit-scrollbar {
+    width: 12px;
+}
+
+.social-section::-webkit-scrollbar-track {
+    background: #FFFBEA;
+    border-radius: 6px;
+}
+
+.social-section::-webkit-scrollbar-thumb {
+    background: #FFD93D;
+    border-radius: 6px;
+    border: 2px solid #FFFBEA;
+}
+
+.social-section::-webkit-scrollbar-thumb:hover {
+    background: #F4C430;
 }
 
 .section-title {
@@ -290,6 +360,7 @@
     padding-left: 5px;
     border-left: 5px solid #FFD93D;
     padding-left: 12px;
+    flex-shrink: 0;
 }
 
 .join-btn {
@@ -349,4 +420,175 @@
     background: #FFE5A3;
     color: #2C2C2C;
     transform: rotate(90deg);
+}
+
+/* Tabs */
+.social-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #FFD93D;
+    padding-bottom: 10px;
+    flex-shrink: 0;
+}
+
+.social-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #FFFBEA;
+    border: 3px solid #FFD93D;
+    border-bottom: none;
+    border-radius: 15px 15px 0 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #5A5A5A;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 0 #F4C430;
+}
+
+.social-tab:hover {
+    background: #FFF5D6;
+    color: #2C2C2C;
+}
+
+.social-tab.active {
+    background: #FFD93D;
+    color: #2C2C2C;
+    box-shadow: 0 4px 0 #F4C430;
+    transform: translateY(-2px);
+}
+
+/* Search */
+.social-search {
+    position: relative;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.social-search input {
+    width: 100%;
+    padding: 12px 12px 12px 45px;
+    border: 3px solid #FFD93D;
+    border-radius: 15px;
+    background: #FFFBEA;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2C2C2C;
+    outline: none;
+    box-shadow: 0 3px 0 #F4C430;
+    transition: all 0.2s;
+}
+
+.social-search input:focus {
+    border-color: #FF9A3D;
+    box-shadow: 0 4px 0 #E88A2D;
+}
+
+.social-search .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #F4C430;
+}
+
+/* Additional badges */
+.status-badge.friend {
+    background: #E8F5E9;
+    color: #2E7D32;
+    border: 1px solid #C8E6C9;
+}
+
+.status-badge.pending {
+    background: #FFF3E0;
+    color: #E65100;
+    border: 1px solid #FFE0B2;
+}
+
+/* Add button */
+.add-btn {
+    background: #FFD93D;
+    color: #2C2C2C;
+    border: 3px solid #F4C430;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 #F4C430;
+}
+
+.add-btn:hover {
+    background: #FF9A3D;
+    border-color: #E88A2D;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #E88A2D;
+}
+
+/* Remove button */
+.remove-btn {
+    background: #FF6B6B;
+    color: white;
+    border: 3px solid #E85555;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 #E85555;
+}
+
+.remove-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #E85555;
+    background: #E85555;
+}
+
+/* Refresh button small */
+.refresh-btn-small {
+    background: transparent;
+    border: 2px solid #FFD93D;
+    color: #F4C430;
+    padding: 6px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.refresh-btn-small:hover {
+    background: #FFD93D;
+    color: #2C2C2C;
+    transform: rotate(90deg);
+}
+
+/* Empty state */
+.social-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #5A5A5A;
+}
+
+.social-empty p {
+    margin: 5px 0;
+    font-weight: 600;
+}
+
+/* Loading */
+.social-loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: #5A5A5A;
+    font-weight: 600;
 }

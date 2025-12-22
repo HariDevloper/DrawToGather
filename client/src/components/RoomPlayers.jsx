@@ -82,14 +82,10 @@ const RoomPlayers = ({ roomId, currentUserId }) => {
 
     return (
         <div className="room-players-sidebar">
-            <div className="players-header">
-                <Users size={20} />
-                <h3>Players ({players.length})</h3>
-            </div>
             <div className="players-list">
                 {players.length === 0 ? (
                     <div className="empty-players">
-                        <p>Loading players...</p>
+                        <p>Loading members...</p>
                     </div>
                 ) : (
                     players.map(player => (
@@ -124,9 +120,6 @@ const RoomPlayers = ({ roomId, currentUserId }) => {
                                         <UserPlus size={16} />
                                     </button>
                                 )
-                            )}
-                            {player.id === currentUserId && (
-                                <span className="player-credits">{player.credits} 🪙</span>
                             )}
                         </div>
                     ))

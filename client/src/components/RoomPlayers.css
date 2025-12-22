@@ -1,150 +1,105 @@
 .room-players-sidebar {
-    position: fixed;
-    left: 20px;
-    top: 110px;
-    width: 280px;
-    max-height: calc(100vh - 140px);
-    background: white;
-    border: 4px solid #FFD93D;
-    border-radius: 25px;
-    box-shadow: 0 8px 0 #F4C430;
+    width: 100%;
+    height: 100%;
+    background: transparent;
     overflow: hidden;
-    z-index: 900;
-}
-
-.players-header {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 18px 20px;
-    background: #FFD93D;
-    border-bottom: 4px solid #F4C430;
-}
-
-.players-header svg {
-    color: #2C2C2C;
-}
-
-.players-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #2C2C2C;
+    flex-direction: column;
 }
 
 .players-list {
-    padding: 15px;
-    max-height: calc(100vh - 240px);
+    padding: 10px 0;
+    flex: 1;
+    /* Fill available space */
     overflow-y: auto;
-}
-
-.empty-players {
-    text-align: center;
-    padding: 30px 15px;
-}
-
-.empty-players p {
-    color: #5A5A5A;
-    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .player-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px;
-    border-radius: 15px;
-    margin-bottom: 10px;
+    gap: 15px;
+    padding: 10px;
     background: #FFFBEA;
-    border: 3px solid #FFD93D;
+    border: 2px solid #FFD93D;
+    border-radius: 15px;
     transition: all 0.2s;
-}
-
-.player-item:hover {
-    background: #FFF4A3;
-    transform: translateX(-3px);
-}
-
-.player-item.current-user {
-    background: #FFD93D;
-    border-color: #F4C430;
     box-shadow: 0 3px 0 #F4C430;
 }
 
+.player-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #F4C430;
+}
+
 .player-avatar {
-    width: 55px;
-    height: 55px;
-    background: #FFD93D;
-    border: 3px solid #F4C430;
+    width: 45px;
+    height: 45px;
+    background: white;
+    border: 2px solid #FFD93D;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
     flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .player-info {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 3px;
 }
 
 .player-name {
-    font-weight: 700;
+    font-weight: 800;
     color: #2C2C2C;
     font-size: 0.95rem;
 }
 
 .you-badge {
-    background: #FF9A3D;
     color: white;
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-size: 0.7rem;
-    font-weight: 700;
+    background: #FF9A3D;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 6px;
     width: fit-content;
+    margin-top: 2px;
 }
 
 .player-credits {
-    font-weight: 700;
+    font-weight: 900;
     color: #FF9A3D;
-    font-size: 0.9rem;
-    white-space: nowrap;
+    font-size: 0.85rem;
 }
 
-.add-friend-btn-small {
-    background: #FFD93D;
-    color: #2C2C2C;
-    border: 3px solid #F4C430;
+.add-friend-btn-small,
+.friend-icon {
     padding: 8px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
-    align-items: center;
-    justify-content: center;
     transition: all 0.2s;
-    box-shadow: 0 3px 0 #F4C430;
-    flex-shrink: 0;
+}
+
+.add-friend-btn-small {
+    background: white;
+    border: 2px solid #FFD93D;
+    color: #2C2C2C;
 }
 
 .add-friend-btn-small:hover {
-    background: #FF9A3D;
-    border-color: #E88A2D;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 0 #E88A2D;
+    background: #FFD93D;
+    transform: scale(1.1);
 }
 
 .friend-icon {
-    background: #4CAF50;
-    color: white;
-    border: 3px solid #3D8B40;
-    padding: 8px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 3px 0 #3D8B40;
-    flex-shrink: 0;
+    color: #4CAF50;
+    background: white;
+    border: 2px solid #4CAF50;
 }

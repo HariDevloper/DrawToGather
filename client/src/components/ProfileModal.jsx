@@ -7,7 +7,15 @@ import './ProfileModal.css';
 const AVATARS = Array.from({ length: 10 }, (_, i) => `avatar${i + 1}.png`);
 import { API_URL as BASE_API_URL } from '../config';
 
+import { COUNTRIES } from '../data/countries';
+
 const API_URL = `${BASE_API_URL}/users`;
+
+// Create map for fast lookup
+const COUNTRY_FLAGS = COUNTRIES.reduce((acc, curr) => {
+    acc[curr.name] = curr.flag;
+    return acc;
+}, {});
 
 const ProfileModal = ({ user, onClose, onUpdate, onLogout }) => {
     const [username, setUsername] = useState(user.username);
@@ -34,6 +42,8 @@ const ProfileModal = ({ user, onClose, onUpdate, onLogout }) => {
         }
     };
 
+
+
     return (
         <div className="modal-overlay">
             <motion.div
@@ -57,7 +67,14 @@ const ProfileModal = ({ user, onClose, onUpdate, onLogout }) => {
                             className="current-avatar-large"
                             onError={(e) => e.target.src = '/profiles/avatar1.png'}
                         />
+                        {user.country && COUNTRY_FLAGS[user.country] && (
+                            <div className="profile-flag" title={user.country}>
+                                {COUNTRY_FLAGS[user.country]}
+                            </div>
+                        )}
                     </div>
+
+
 
                     <div className="input-group">
                         <label>Username</label>

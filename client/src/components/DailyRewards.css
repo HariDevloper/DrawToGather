@@ -1,0 +1,182 @@
+.reward-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+
+.reward-modal-content {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+    border: 4px solid var(--yellow-primary);
+    border-radius: 30px;
+    padding: 30px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    position: relative;
+    text-align: center;
+}
+
+.reward-header h2 {
+    font-size: 2rem;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+}
+
+.reward-header p {
+    color: var(--text-medium);
+    margin-bottom: 30px;
+}
+
+.streak-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.streak-day {
+    background: white;
+    border: 2px solid #eee;
+    border-radius: 15px;
+    padding: 15px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* Make day 7 span full width or larger */
+.day-7 {
+    grid-column: span 4;
+    /* Full width row */
+    background: linear-gradient(45deg, #fff9c4, #fff);
+    border-color: #ffd700;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+.streak-day.active {
+    border-color: #ffd700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    transform: translateY(-5px);
+    background: #fffff0;
+}
+
+.streak-day.claimed {
+    background: #f0fff0 !important;
+    border-color: #4caf50 !important;
+    opacity: 1;
+    /* Make sure it is fully visible */
+}
+
+.streak-day.locked {
+    opacity: 0.6;
+    background: #f5f5f5;
+}
+
+.day-label {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.active .day-label {
+    color: #d4ac0d;
+}
+
+.reward-icon {
+    font-size: 1.5rem;
+    margin: 5px 0;
+    color: #ffd700;
+}
+
+.coin-circle {
+    width: 30px;
+    height: 30px;
+    background: #ffd700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: inset 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.amount {
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+.day-7 .amount {
+    font-size: 2rem;
+    color: #ff8c00;
+}
+
+.claimed-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(76, 175, 80, 0.2);
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2e7d32;
+}
+
+.claim-btn {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    border: none;
+    padding: 15px 40px;
+    border-radius: 30px;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(255, 165, 0, 0.3);
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.claim-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(255, 165, 0, 0.4);
+}
+
+.claim-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.claim-btn.disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.next-claim-text {
+    margin-top: 15px;
+    color: #888;
+    font-size: 0.9rem;
+}

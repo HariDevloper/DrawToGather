@@ -1,41 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import io from 'socket.io-client';
 import { Bell, Check, X, Copy, LogIn } from 'lucide-react';
 import './Notifications.css';
-
-import { API_URL as BASE_API_URL, SOCKET_URL } from '../config';
+import { API_URL as BASE_API_URL } from '../config';
 
 const API_URL = `${BASE_API_URL}/users`;
-const socket = io(SOCKET_URL);
 
-const Notifications = ({ user, onUpdateUser, onJoinRoom }) => {
+const Notifications = ({ socket, user, onUpdateUser, onJoinRoom, externalShow, onToggle }) => {
     const [notifications, setNotifications] = useState([]);
-    const [showPanel, setShowPanel] = useState(false);
+    const [internalShow, setInternalShow] = useState(false);
+    const showPanel = externalShow !== undefined ? externalShow : internalShow;
+    const togglePanel = onToggle || (() => setInternalShow(!internalShow));
     const [roomInvites, setRoomInvites] = useState([]);
 
     useEffect(() => {
-        if (user?.id) {
+        const userId = user?.id || user?._id;
+        if (userId) {
             fetchNotifications();
             // Refresh every 5 seconds
             const interval = setInterval(fetchNotifications, 5000);
 
-            // Listen for room invites
             socket.on('room-invite-received', (data) => {
                 console.log('Room invite received:', data);
-                const newInvite = {
-                    id: `invite-${Date.now()}`,
-                    type: 'room_invite',
-                    from: data.fromUsername,
-                    roomId: data.roomId,
-                    roomName: data.roomName,
-                    timestamp: data.timestamp
-                };
-                setRoomInvites(prev => [newInvite, ...prev]);
-                // Auto-remove after 20 seconds
-                setTimeout(() => {
-                    setRoomInvites(prev => prev.filter(inv => inv.id !== newInvite.id));
-                }, 20000);
+                // Trigger immediate fetch to show the new invite synchronized with DB
+                fetchNotifications();
             });
 
             return () => {
@@ -46,9 +34,12 @@ const Notifications = ({ user, onUpdateUser, onJoinRoom }) => {
     }, [user]);
 
     const fetchNotifications = async () => {
+        const userId = user?.id || user?._id;
         try {
-            const res = await axios.get(`${API_URL}/${user.id}/profile`);
+            const res = await axios.get(`${API_URL}/${userId}/profile`);
             const friendRequests = res.data.friendRequests || [];
+            const dbRoomInvites = res.data.roomInvites || [];
+
             setNotifications(friendRequests.map(req => ({
                 id: req.id,
                 type: 'friend_request',
@@ -56,8 +47,42 @@ const Notifications = ({ user, onUpdateUser, onJoinRoom }) => {
                 avatar: req.avatar,
                 data: req
             })));
+
+            // 2. Handle Room Invites - replace state to avoid duplicates/stale items
+            setRoomInvites(dbRoomInvites.map(dbi => ({
+                id: dbi.id,
+                type: 'room_invite',
+                from: dbi.from,
+                avatar: dbi.fromAvatar || 'avatar1.png',
+                roomId: dbi.roomId,
+                roomName: dbi.roomName,
+                timestamp: dbi.timestamp,
+                isPersistent: true
+            })));
         } catch (err) {
             console.error('Failed to fetch notifications', err);
+        }
+    };
+
+    const handleInviteAction = async (invite, action) => {
+        const userId = user?.id || user?._id;
+        if (action === 'accept') {
+            onJoinRoom(invite.roomId);
+        }
+
+        // Remove from UI
+        setRoomInvites(prev => prev.filter(i => i.id !== invite.id));
+
+        // Delete from DB if it was persistent
+        if (invite.id && !invite.id.startsWith('invite-')) {
+            try {
+                await axios.post(`${API_URL}/room-invite-dismiss`, {
+                    userId,
+                    inviteId: invite.id
+                });
+            } catch (err) {
+                console.error('Failed to delete invite from DB', err);
+            }
         }
     };
 
@@ -99,7 +124,7 @@ const Notifications = ({ user, onUpdateUser, onJoinRoom }) => {
     const joinRoom = (roomId) => {
         if (onJoinRoom) {
             onJoinRoom(roomId);
-            setShowPanel(false);
+            togglePanel(false);
         } else {
             alert(`Joining room ${roomId}...`);
         }
@@ -107,8 +132,11 @@ const Notifications = ({ user, onUpdateUser, onJoinRoom }) => {
 
     return (
         <>
-            <button className="notification-bell" onClick={() => setShowPanel(!showPanel)}>
-                <Bell size={20} />
+            <button className="notification-bell" onClick={(e) => {
+                e.stopPropagation();
+                togglePanel();
+            }}>
+                <Bell size={24} />
                 {allNotifications.length > 0 && (
                     <span className="notification-badge">{allNotifications.length}</span>
                 )}
@@ -170,23 +198,23 @@ const Notifications = ({ user, onUpdateUser, onJoinRoom }) => {
                                                 />
                                             </div>
                                             <div className="notif-content">
-                                                <p><strong>{notif.from}</strong> invited you to join</p>
-                                                <span className="room-id-badge">#{notif.roomId}</span>
+                                                <p><strong>{notif.from}</strong> wants to play with you! 🎮</p>
+                                                <p className="notif-subtext">Room: <strong>{notif.roomName || 'Untitled'}</strong></p>
                                             </div>
                                             <div className="notif-actions">
                                                 <button
                                                     className="join-notif-btn"
-                                                    onClick={() => joinRoom(notif.roomId)}
+                                                    onClick={() => handleInviteAction(notif, 'accept')}
                                                     title="Join Room"
                                                 >
                                                     <LogIn size={16} />
                                                 </button>
                                                 <button
-                                                    className="copy-notif-btn"
-                                                    onClick={() => copyRoomId(notif.roomId)}
-                                                    title="Copy Room ID"
+                                                    className="reject-notif-btn"
+                                                    onClick={() => handleInviteAction(notif, 'dismiss')}
+                                                    title="Dismiss"
                                                 >
-                                                    <Copy size={16} />
+                                                    <X size={16} />
                                                 </button>
                                             </div>
                                         </>

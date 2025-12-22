@@ -6,15 +6,31 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import Auth from './components/Auth';
 import Onboarding from './components/Onboarding';
 import ProfileModal from './components/ProfileModal';
-import { Pencil, Eraser, Trash2, Users, CreditCard, Plus, X, LogOut, RefreshCw, Pipette, User as UserIcon } from 'lucide-react';
-import Social from './components/Social';
-import RoomPlayers from './components/RoomPlayers';
 import Notifications from './components/Notifications';
 import Toast from './components/Toast';
 import SystemDiagnostics from './components/SystemDiagnostics';
+import DailyRewards from './components/DailyRewards';
+import Social from './components/Social';
+import RoomPlayers from './components/RoomPlayers';
+import DrawingExport from './components/DrawingExport';
+import CreateRoomModal from './components/CreateRoomModal';
+import MusicPlayer from './components/MusicPlayer';
+import RoomChat from './components/RoomChat';
+import ThemeSelector from './components/ThemeSelector';
+import {
+  Pencil, Eraser, Trash2, Users, CreditCard, Plus,
+  X, LogOut, RefreshCw, Pipette, User as UserIcon,
+  Gift, Save, Zap, Copy, ChevronLeft, ChevronRight,
+  ChevronUp, ChevronDown, Share2, Maximize, MessageSquare, Download,
+  Pen, Cloud, Music, Bell, Play, Pause, SkipBack, SkipForward, Check
+} from 'lucide-react';
 import './App.css';
-
+import './room_layout.css';
 import { API_URL, SOCKET_URL } from './config';
+import { DEFAULT_COLOR_PALETTE, generateColorShades } from './utils/colorUtils';
+import { PLAYLIST } from './data/playlist';
+
+const VIRTUAL_SIZE = 2000;
 
 const socket = io(SOCKET_URL);
 
@@ -24,32 +40,31 @@ function App() {
   const lastPos = useRef({ x: 0, y: 0 });
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState('#000000');
+  const [colorShades, setColorShades] = useState(generateColorShades('#000000'));
   const [brushSize, setBrushSize] = useState(5);
+  const [brushType, setBrushType] = useState('pencil'); // 'pencil', 'marker', 'spray'
   const [isEraser, setIsEraser] = useState(false);
   const [isEyedropper, setIsEyedropper] = useState(false);
   const [roomId, setRoomId] = useState('default');
 
-  // Default color palette
-  const colorPalette = [
-    '#000000', // Black
-    '#FFFFFF', // White
-    '#FF0000', // Red
-    '#00FF00', // Green
-    '#0000FF', // Blue
-    '#FFFF00', // Yellow
-    '#FF00FF', // Magenta
-    '#00FFFF', // Cyan
-    '#FF8800', // Orange
-    '#8800FF', // Purple
-    '#00FF88', // Mint
-    '#FF0088', // Pink
-  ];
-  const [user, setUser] = useState(null);
+  // Use imported color palette
+  const colorPalette = DEFAULT_COLOR_PALETTE;
+
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showSocial, setShowSocial] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showDailyRewards, setShowDailyRewards] = useState(false);
+  const [showExport, setShowExport] = useState(false);
+  const [showMusicPlayer, setShowMusicPlayer] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [userFriends, setUserFriends] = useState([]);
   const [inviteCooldowns, setInviteCooldowns] = useState({}); // Track invite cooldowns per friend
   const [newRoomName, setNewRoomName] = useState('');
@@ -59,22 +74,122 @@ function App() {
   const [view, setView] = useState('lobby'); // 'lobby' or 'canvas'
   const [roomPlayers, setRoomPlayers] = useState([]);
   const [toasts, setToasts] = useState([]);
+  const [roomTheme, setRoomTheme] = useState(null);
+  const [roomName, setRoomName] = useState('');
+  const [toolsExpanded, setToolsExpanded] = useState(true);
+  const [propertiesExpanded, setPropertiesExpanded] = useState(true);
+  const [localCursor, setLocalCursor] = useState({ x: 0, y: 0, show: false });
+
+  // Music Player State
+  const [currentSongIndex, setCurrentSongIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(new Audio(PLAYLIST[0].url));
+  const currentSong = PLAYLIST[currentSongIndex];
+
+  const ThemeAmbient = ({ theme }) => {
+    if (!theme || !theme.particles || theme.particles.length === 0) return null;
+
+    const particleCount = 15; // Number of particles to show
+
+    return (
+      <div className="theme-particles-container">
+        {[...Array(particleCount)].map((_, i) => {
+          const particle = theme.particles[i % theme.particles.length];
+          return (
+            <motion.div
+              key={i}
+              className="theme-particle"
+              initial={{
+                x: Math.random() * window.innerWidth,
+                y: -50,
+                opacity: 0,
+                rotate: 0
+              }}
+              animate={{
+                y: window.innerHeight + 50,
+                opacity: [0, 0.7, 0.7, 0],
+                rotate: 360,
+                x: `calc(${Math.random() * window.innerWidth}px + ${Math.sin(i) * 80}px)`
+              }}
+              transition={{
+                duration: 8 + Math.random() * 12,
+                repeat: Infinity,
+                ease: "linear",
+                delay: Math.random() * 10
+              }}
+              style={{
+                color: theme.primaryColor || '#FFA500'
+              }}
+            >
+              {particle}
+            </motion.div>
+          );
+        })}
+      </div>
+    );
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const savedUser = JSON.parse(localStorage.getItem('user'));
-      if (savedUser) {
-        // Ensure id is present
-        const userWithId = { ...savedUser, id: savedUser.id || savedUser._id };
-        setUser(userWithId);
+    // Sync user to local storage whenever it changes
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+  }, [user]);
+
+  // Fetch fresh user data on load to ensure lastDailyClaim is up to date
+  useEffect(() => {
+    const refreshUser = async () => {
+      if (user?.id) {
+        try {
+          const res = await axios.get(`${API_URL}/users/${user.id}/profile`);
+          // Merge with existing session data to keep token etc if needed, 
+          // but mostly we just want the fresh db fields
+          const freshUser = { ...user, ...res.data };
+          setUser(freshUser);
+          localStorage.setItem('user', JSON.stringify(freshUser));
+        } catch (err) {
+          console.error('Failed to refresh user profile:', err);
+        }
+      }
+    };
+    refreshUser();
+  }, []); // Run once on mount (if user exists in state from lazy init)
+
+  // Persist room state to localStorage
+  useEffect(() => {
+    if (roomId && roomId !== 'default') {
+      localStorage.setItem('currentRoom', JSON.stringify({
+        roomId,
+        roomName,
+        roomTheme,
+        view
+      }));
+    } else {
+      localStorage.removeItem('currentRoom');
+    }
+  }, [roomId, roomName, roomTheme, view]);
+
+  // Restore room state on mount
+  useEffect(() => {
+    const savedRoom = localStorage.getItem('currentRoom');
+    if (savedRoom && user) {
+      try {
+        const { roomId: savedRoomId, roomName: savedRoomName, roomTheme: savedTheme, view: savedView } = JSON.parse(savedRoom);
+        if (savedRoomId && savedRoomId !== 'default') {
+          setRoomId(savedRoomId);
+          setRoomName(savedRoomName);
+          setRoomTheme(savedTheme);
+          setView(savedView);
+        }
+      } catch (err) {
+        console.error('Failed to restore room state:', err);
+        localStorage.removeItem('currentRoom');
       }
     }
-  }, []);
+  }, [user]); // Only run when user is loaded
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
       // Emit user online status
       socket.emit('user-online', user.id || user._id);
 
@@ -88,8 +203,14 @@ function App() {
 
       window.addEventListener('beforeunload', handleBeforeUnload);
 
+      socket.on('rooms-updated', () => {
+        console.log('Rooms updated, refreshing...');
+        fetchPublicRooms();
+      });
+
       return () => {
         window.removeEventListener('beforeunload', handleBeforeUnload);
+        socket.off('rooms-updated');
       };
     }
   }, [user, roomId]);
@@ -103,20 +224,26 @@ function App() {
     }
   }, [view]);
 
+  // Fetch friends when invite modal opens
+  useEffect(() => {
+    if (showInviteModal && user?.id) {
+      fetchUserFriends();
+    }
+  }, [showInviteModal]);
+
   useEffect(() => {
     if (view !== 'canvas') return; // Only initialize when in canvas view
 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    canvas.width = window.innerWidth * 2;
-    canvas.height = window.innerHeight * 2;
-    canvas.style.width = `${window.innerWidth}px`;
-    canvas.style.height = `${window.innerHeight}px`;
+    // FIXED INTERNAL RESOLUTION for cross-device consistency
+    canvas.width = VIRTUAL_SIZE;
+    canvas.height = VIRTUAL_SIZE;
 
     const context = canvas.getContext('2d');
-    context.scale(2, 2);
     context.lineCap = 'round';
+    context.lineJoin = 'round';
     context.strokeStyle = color;
     context.lineWidth = brushSize;
     contextRef.current = context;
@@ -125,8 +252,18 @@ function App() {
     socket.emit('join-room', { roomId, userId: user?.id || user?._id });
 
     socket.on('draw', (data) => {
-      const { x, y, prevX, prevY, color, size } = data;
-      drawOnCanvas(x, y, prevX, prevY, color, size);
+      const { x, y, prevX, prevY, color, size, type } = data;
+      drawOnCanvas(x, y, prevX, prevY, color, size, type);
+    });
+
+    // Listen for canvas sync (existing drawings when joining)
+    socket.on('canvas-sync', (drawHistory) => {
+      console.log(`Received ${drawHistory.length} draw events to sync`);
+      // Replay all draw events
+      drawHistory.forEach(data => {
+        const { x, y, prevX, prevY, color, size, type } = data;
+        drawOnCanvas(x, y, prevX, prevY, color, size, type);
+      });
     });
 
     socket.on('clear-canvas', () => {
@@ -173,56 +310,100 @@ function App() {
       }
     });
 
+    // Listen for room deletion
+    socket.on('room-deleted-notification', (data) => {
+      showToast('The host has deleted this room', 'error');
+      // Kick user back to lobby
+      setTimeout(() => {
+        handleLeaveRoom();
+      }, 2000);
+    });
+
+    // Listen for theme changes
+    socket.on('theme-changed', (data) => {
+      console.log('Theme changed to:', data.theme);
+      setRoomTheme(data.theme);
+      showToast(`Theme changed to ${data.theme.name}`, 'info');
+    });
+
     const handleResize = () => {
-      if (!canvas) return;
-      // Save current content
-      const tempImage = canvas.toDataURL();
-
-      canvas.width = window.innerWidth * 2;
-      canvas.height = window.innerHeight * 2;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-
-      const context = canvas.getContext('2d');
-      context.scale(2, 2);
-      context.lineCap = 'round';
-      context.strokeStyle = color;
-      context.lineWidth = brushSize;
-      contextRef.current = context;
-
-      // Restore content
-      const img = new Image();
-      img.src = tempImage;
-      img.onload = () => {
-        context.drawImage(img, 0, 0, canvas.width / 2, canvas.height / 2);
-      };
+      // With fixed internal resolution, we don't need to do anything on resize
+      // except maybe ensuring the CSS keeps it square (which is handled in room_layout.css)
     };
 
     window.addEventListener('resize', handleResize);
 
     return () => {
       socket.off('draw');
+      socket.off('canvas-sync');
       socket.off('clear-canvas');
       socket.off('user-cursor');
       socket.off('player-joined');
       socket.off('player-left');
+      socket.off('room-deleted-notification');
       window.removeEventListener('resize', handleResize);
     };
   }, [roomId, view]);
 
-  const drawOnCanvas = (x, y, prevX, prevY, drawColor, drawSize) => {
+  const drawOnCanvas = (x, y, prevX, prevY, drawColor, drawSize, type = 'pencil') => {
     if (!contextRef.current) return;
-    contextRef.current.strokeStyle = drawColor;
-    contextRef.current.lineWidth = drawSize;
-    contextRef.current.beginPath();
-    contextRef.current.moveTo(prevX, prevY);
-    contextRef.current.lineTo(x, y);
-    contextRef.current.stroke();
-    contextRef.current.closePath();
+    const ctx = contextRef.current;
+
+    ctx.lineWidth = drawSize;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    if (type === 'marker') {
+      ctx.globalAlpha = 0.3;
+      ctx.strokeStyle = drawColor;
+      ctx.lineWidth = drawSize * 1.5;
+    } else if (type === 'spray') {
+      ctx.globalAlpha = 1;
+      const density = 30;
+      for (let i = density; i--;) {
+        const radius = drawSize * 1.0;
+        const offsetX = (Math.random() - 0.5) * 2 * radius;
+        const offsetY = (Math.random() - 0.5) * 2 * radius;
+        ctx.fillStyle = drawColor;
+        ctx.fillRect(x + offsetX, y + offsetY, 1, 1);
+      }
+      return;
+    } else {
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = drawColor;
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(prevX, prevY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.globalAlpha = 1; // reset alpha
   };
 
-  const startDrawing = ({ nativeEvent }) => {
-    const { offsetX, offsetY } = nativeEvent;
+  const getCoordinates = (event) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { offsetX: 0, offsetY: 0 };
+
+    const rect = canvas.getBoundingClientRect();
+
+    let clientX, clientY;
+    if (event.touches && event.touches[0]) {
+      clientX = event.touches[0].clientX;
+      clientY = event.touches[0].clientY;
+    } else {
+      clientX = event.clientX || event.nativeEvent?.clientX;
+      clientY = event.clientY || event.nativeEvent?.clientY;
+    }
+
+    // Map screen position to virtual 0-2000 system
+    const x = ((clientX - rect.left) / rect.width) * VIRTUAL_SIZE;
+    const y = ((clientY - rect.top) / rect.height) * VIRTUAL_SIZE;
+
+    return { offsetX: x, offsetY: y };
+  };
+
+  const startDrawing = (e) => {
+    const { offsetX, offsetY } = getCoordinates(e);
 
     // If eyedropper is active, pick color from canvas
     if (isEyedropper) {
@@ -232,6 +413,11 @@ function App() {
 
     lastPos.current = { x: offsetX, y: offsetY };
     setIsDrawing(true);
+
+    // Initial dot for spray or single click
+    if (brushType === 'spray' && !isEraser) {
+      drawOnCanvas(offsetX, offsetY, offsetX, offsetY, color, brushSize, 'spray');
+    }
   };
 
   const pickColorFromCanvas = (x, y) => {
@@ -239,8 +425,8 @@ function App() {
     if (!canvas) return;
 
     const context = canvas.getContext('2d');
-    // Get pixel data at the clicked position (multiply by 2 for retina display)
-    const pixelData = context.getImageData(x * 2, y * 2, 1, 1).data;
+    // x and y are in virtual 2000x2000 coordinates
+    const pixelData = context.getImageData(x, y, 1, 1).data;
 
     // Convert RGB to hex
     const r = pixelData[0];
@@ -258,44 +444,73 @@ function App() {
     setIsDrawing(false);
   };
 
-  const draw = ({ nativeEvent }) => {
+  const draw = (e) => {
     if (!isDrawing) return;
-    const { offsetX, offsetY } = nativeEvent;
+    const { offsetX, offsetY } = getCoordinates(e);
+
+    // Smoothing: Use higher factor for less lag, or 1.0 for direct drawing
+    const lerpX = offsetX;
+    const lerpY = offsetY;
+
     const prevX = lastPos.current.x;
     const prevY = lastPos.current.y;
 
     const currentColor = isEraser ? '#ffffff' : color;
-    drawOnCanvas(offsetX, offsetY, prevX, prevY, currentColor, brushSize);
+    const currentType = isEraser ? 'pencil' : brushType;
+
+    drawOnCanvas(lerpX, lerpY, prevX, prevY, currentColor, brushSize, currentType);
 
     socket.emit('draw', {
       roomId,
-      x: offsetX,
-      y: offsetY,
+      x: lerpX,
+      y: lerpY,
       prevX,
       prevY,
       color: currentColor,
-      size: brushSize
+      size: brushSize,
+      type: currentType
     });
 
-    lastPos.current = { x: offsetX, y: offsetY };
+    lastPos.current = { x: lerpX, y: lerpY };
   };
 
-  const handleMouseMove = ({ nativeEvent }) => {
-    const { offsetX, offsetY } = nativeEvent;
+  const handleMouseMove = (e) => {
+    const { offsetX, offsetY } = getCoordinates(e);
 
-    // Emit cursor position
-    socket.emit('mouse-move', {
-      roomId,
-      socketId: socket.id,
-      x: offsetX,
-      y: offsetY,
-      username: user?.username
-    });
+    // Emit cursor position - throttle to reduce network noise
+    if (!window.lastMouseMoveEmit || Date.now() - window.lastMouseMoveEmit > 33) {
+      socket.emit('mouse-move', {
+        roomId,
+        socketId: socket.id,
+        x: offsetX,
+        y: offsetY,
+        username: user?.username
+      });
+      window.lastMouseMoveEmit = Date.now();
+    }
+
+    // Update local cursor preview
+    setLocalCursor({ x: offsetX, y: offsetY, show: true });
 
     // If drawing, call draw
     if (isDrawing) {
-      draw({ nativeEvent });
+      draw(e);
     }
+  };
+
+  const handleTouchStart = (e) => {
+    if (e.cancelable) e.preventDefault();
+    startDrawing(e);
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.cancelable) e.preventDefault();
+    handleMouseMove(e);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (e.cancelable) e.preventDefault();
+    finishDrawing();
   };
 
   const showToast = (message, type = 'success') => {
@@ -334,12 +549,18 @@ function App() {
     socket.emit('clear-canvas', roomId);
   };
 
-  const handleCreateRoom = async () => {
-    if (!newRoomName) return;
+  const copyRoomId = () => {
+    navigator.clipboard.writeText(roomId).then(() => {
+      showToast('Room ID copied! Share without the # symbol', 'success');
+    }).catch(err => {
+      console.error('Failed to copy:', err);
+      showToast('Failed to copy Room ID', 'error');
+    });
+  };
 
+  const handleCreateRoom = async (roomData) => {
     console.log('Full user object:', user);
     console.log('User ID:', user?.id);
-    console.log('User _ID:', user?._id);
 
     if (!user || (!user.id && !user._id)) {
       alert('Please log in again - user session expired');
@@ -348,46 +569,161 @@ function App() {
 
     try {
       const userId = user.id || user._id;
-      console.log('Creating room with userId:', userId);
+      const roomId = `room_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      console.log('Creating room with userId:', userId, 'and theme:', roomData.theme);
 
       const res = await axios.post(`${API_URL}/rooms/create`, {
-        name: newRoomName,
-        userId: userId,
-        isPublic: true
+        roomId,
+        name: roomData.name,
+        hostId: userId,
+        isPublic: roomData.isPublic,
+        theme: {
+          id: roomData.theme.id,
+          name: roomData.theme.name,
+          background: roomData.theme.background
+        }
       });
-      setRoomId(res.data.room.roomId);
-      setUser({ ...user, credits: res.data.credits });
+
+      setRoomId(roomId);
+      setRoomTheme(roomData.theme);
+      setRoomName(roomData.name);
       setShowCreateModal(false);
-      setNewRoomName('');
+
+      // Update local user credits
+      if (res.data.updatedCredits !== undefined) {
+        setUser(prev => ({ ...prev, credits: res.data.updatedCredits }));
+      }
+
       setView('canvas');
       clearCanvas();
+
+      showToast(`Room "${roomData.name}" created!`, 'success');
     } catch (err) {
       console.error('Room creation error:', err);
-      console.error('Error response:', err.response);
-      console.error('Error data:', err.response?.data);
-      console.error('Error status:', err.response?.status);
       alert(err.response?.data?.message || err.message || 'Failed to create room');
     }
   };
 
-  const handleJoinRoom = (id) => {
+  const handleQuickPlay = async () => {
+    if (!user || (!user.id && !user._id)) {
+      alert('Please log in first');
+      return;
+    }
+
+    try {
+      const res = await axios.get(`${API_URL}/rooms/random-public`);
+      const randomRoom = res.data;
+
+      setRoomId(randomRoom.id);
+      setRoomName(randomRoom.name);
+      if (randomRoom.theme) {
+        setRoomTheme(randomRoom.theme);
+      }
+      setView('canvas');
+      showToast(`Joined ${randomRoom.name}!`, 'success');
+    } catch (err) {
+      if (err.response?.status === 404) {
+        showToast('No public rooms available. Create one!', 'info');
+      } else {
+        console.error('Quick play error:', err);
+        showToast('Failed to find a room', 'error');
+      }
+    }
+  };
+
+  const handleJoinRoom = async (id) => {
     if (!id) return;
     // Remove # if present
     const cleanId = id.replace('#', '');
-    setRoomId(cleanId);
-    setShowJoinModal(false);
-    setJoinRoomId('');
-    setView('canvas');
-    clearCanvas();
+
+    try {
+      // Fetch room details to get name and theme
+      const res = await axios.get(`${API_URL}/rooms/${cleanId}`);
+      const roomData = res.data;
+
+      setRoomId(cleanId);
+      setRoomName(roomData.name);
+      if (roomData.theme) {
+        setRoomTheme(roomData.theme);
+      }
+      setShowJoinModal(false);
+      setJoinRoomId('');
+      setView('canvas');
+      clearCanvas();
+    } catch (err) {
+      console.error('Failed to fetch room details:', err);
+      // Still join even if we can't get details
+      setRoomId(cleanId);
+      setRoomName('Unknown Room');
+      // Fallback to first theme (Sunset)
+      setRoomTheme({
+        id: 'sunset',
+        name: 'Sunset Beach',
+        background: 'linear-gradient(135deg, #FF6B6B 0%, #FFE66D 50%, #4ECDC4 100%)',
+        preview: '🌅'
+      });
+      setShowJoinModal(false);
+      setJoinRoomId('');
+      setView('canvas');
+      clearCanvas();
+    }
   };
 
   const handleLeaveRoom = () => {
+    // Show confirmation modal instead of window.confirm
+    setShowLeaveModal(true);
+  };
+
+  const confirmLeaveRoom = () => {
     // Emit leave-room event to server
     socket.emit('leave-room', { roomId, userId: user?.id || user?._id });
 
-    // Set view back to lobby instead of reloading
-    setView('lobby');
-    setRoomId('default');
+    // Clear room state from localStorage
+    localStorage.removeItem('currentRoom');
+
+    // Force a page refresh for the user who left to ensure clean state
+    // as requested by the user: "the page should refresh"
+    window.location.reload();
+  };
+
+  const handleDeleteRoom = async () => {
+    // Check if it's a default room
+    const defaultRoomIds = ['default_room_1', 'default_room_2', 'default_room_3', 'default_room_4', 'default_room_5'];
+    if (defaultRoomIds.includes(roomId)) {
+      showToast('Cannot delete default rooms', 'error');
+      return;
+    }
+
+    // Check if user is the host
+    const isHost = roomPlayers.length > 0 && roomPlayers[0]?.id === user?.id;
+    if (!isHost) {
+      showToast('Only the host can delete the room', 'error');
+      return;
+    }
+
+    // Show confirmation dialog
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${roomName}"?\n\nThis will remove the room permanently and all players will be kicked out.`
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      // Delete room via API
+      await axios.delete(`${API_URL}/rooms/${roomId}`);
+
+      // Emit to all players in room that it's being deleted
+      socket.emit('room-deleted', { roomId });
+
+      // Leave the room
+      handleLeaveRoom();
+
+      showToast('Room deleted successfully', 'success');
+    } catch (err) {
+      console.error('Failed to delete room:', err);
+      showToast('Failed to delete room', 'error');
+    }
   };
 
   const fetchPublicRooms = async () => {
@@ -423,7 +759,7 @@ function App() {
       fromUsername: user.username,
       toUserId: friend.id,
       roomId: roomId,
-      roomName: `Room #${roomId}`
+      roomName: roomName || 'Room'
     });
     alert(`Invitation sent to ${friend.username}!`);
 
@@ -440,6 +776,41 @@ function App() {
       });
     }, 20000);
   };
+
+  // Music Player Functions
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if (isPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+    } else {
+      audio.play().catch(e => console.log("Play failed:", e));
+      setIsPlaying(true);
+    }
+  };
+
+  const changeSong = (index) => {
+    const audio = audioRef.current;
+    audio.pause();
+    setCurrentSongIndex(index);
+    audio.src = PLAYLIST[index].url;
+    audio.load();
+    audio.play().catch(e => console.log("Play failed:", e));
+    setIsPlaying(true);
+  };
+
+  // Setup audio event listeners
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    const handleEnded = () => {
+      const nextIndex = (currentSongIndex + 1) % PLAYLIST.length;
+      changeSong(nextIndex);
+    };
+
+    audio.addEventListener('ended', handleEnded);
+    return () => audio.removeEventListener('ended', handleEnded);
+  }, [currentSongIndex]);
 
   const handleLogout = () => {
     // Leave room if in one
@@ -481,87 +852,264 @@ function App() {
 
   return (
     <div className="app-container">
-      {/* Top Bar */}
-      <motion.div
+      {/* 1. TOP BAR (Always Visible) */}
+      <motion.nav
         className="top-bar"
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
       >
         <div className="logo" onClick={() => setView('lobby')} style={{ cursor: 'pointer' }}>DrawToGather</div>
 
         <div className="top-stats">
-          <div className="stat-pill credits">
-            <CreditCard size={18} />
-            <span>{user?.credits || 0}</span>
-          </div>
 
-          <div
-            className="stat-pill profile-btn"
-            onClick={() => setShowProfile(true)}
-            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 12px 5px 5px', background: 'var(--white)', border: '2px solid var(--yellow-primary)', borderRadius: '20px' }}
-          >
-            <div className="profile-img-small" style={{ width: '30px', height: '30px', borderRadius: '50%', overflow: 'hidden', border: '1px solid var(--text-dark)' }}>
-              <img
-                src={`/profiles/${user?.avatar || 'avatar1.png'}`}
-                alt="profile"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(1.4)' }}
-                onError={(e) => e.target.src = '/profiles/avatar1.png'}
-              />
-            </div>
-            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-dark)' }}>{user?.username}</span>
-          </div>
+          {view === 'lobby' && (
+            <>
+              <div className="stat-pill credits">
+                <CreditCard size={18} />
+                <span>{user?.credits || 0}</span>
+              </div>
+
+              <div
+                className="stat-pill profile-img-btn"
+                onClick={() => setShowProfile(true)}
+              >
+                <img
+                  src={`/profiles/${user?.avatar || 'avatar1.png'}`}
+                  alt="profile"
+                  style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }}
+                  onError={(e) => e.target.src = '/profiles/avatar1.png'}
+                />
+              </div>
+
+              <div
+                className="stat-pill username-btn"
+                onClick={() => {
+                  navigator.clipboard.writeText(user?.username || '');
+                  alert('Username copied to clipboard!');
+                }}
+                title="Click to copy username"
+              >
+                <span>{user?.username}</span>
+              </div>
+
+              <motion.div
+                className="stat-pill gift-btn"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowDailyRewards(true)}
+              >
+                <Gift size={18} />
+              </motion.div>
+            </>
+          )}
 
           {view === 'canvas' && (
-            <div className="stat-pill room">
-              <Users size={18} />
-              <span>#{roomId}</span>
-            </div>
+            <>
+              <div className="stat-pill room-name-display" style={{
+                background: '#FF9A3D', // Match dark orange in diagram
+                border: '3px solid #D67A1F',
+                padding: '10px 25px',
+                borderRadius: '15px',
+                fontWeight: '900',
+                fontSize: '1rem',
+                color: 'white',
+                boxShadow: '0 4px 0 #D67A1F',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <span style={{ opacity: 0.9 }}>Room ID: #{roomId?.substring(0, 6) || '12345'}</span>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={copyRoomId}
+                  style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', display: 'flex' }}
+                >
+                  <Copy size={16} />
+                </motion.button>
+              </div>
+            </>
           )}
-          {view === 'canvas' && roomId !== 'default' && (
+
+        </div>
+
+        <div className="top-right">
+          {view === 'canvas' && (
             <>
               <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="invite-friends-btn"
-                onClick={() => {
-                  fetchUserFriends();
-                  setShowInviteModal(true);
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="action-btn invite"
+                style={{
+                  background: 'var(--orange)',
+                  color: 'var(--white)',
+                  border: '4px solid #D67A1F',
+                  padding: '12px 24px',
+                  borderRadius: '25px',
+                  fontWeight: '700',
+                  fontSize: '1.1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  cursor: 'pointer',
+                  boxShadow: '0 6px 0 #D67A1F'
                 }}
-                title="Invite Friends"
+                onClick={() => setShowInviteModal(true)}
               >
                 <Users size={18} />
                 Invite
               </motion.button>
+
               <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="leave-btn"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="action-btn leave"
+                style={{
+                  background: '#FF6B6B',
+                  color: 'white',
+                  border: '4px solid #E85555',
+                  padding: '12px 24px',
+                  borderRadius: '25px',
+                  fontWeight: '700',
+                  fontSize: '1.1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  cursor: 'pointer',
+                  boxShadow: '0 6px 0 #E85555'
+                }}
                 onClick={handleLeaveRoom}
               >
+                <LogOut size={18} />
                 Leave
               </motion.button>
+
+              <div className="music-player-nav-wrap">
+                <MusicPlayer
+                  socket={socket}
+                  roomId={roomId}
+                  isHost={true} // EVERYONE CAN CHANGE MUSIC
+                  externalShow={showMusicPlayer}
+                  onToggle={() => {
+                    setShowMusicPlayer(!showMusicPlayer);
+                    if (!showMusicPlayer) setShowNotifications(false);
+                  }}
+                />
+              </div>
             </>
           )}
+          <Notifications
+            socket={socket}
+            user={user}
+            onUpdateUser={setUser}
+            onJoinRoom={handleJoinRoom}
+            externalShow={showNotifications}
+            onToggle={() => {
+              setShowNotifications(!showNotifications);
+              if (!showNotifications) setShowMusicPlayer(false);
+            }}
+          />
         </div>
+      </motion.nav>
 
-        <div className="top-right">
-          <Notifications user={user} onUpdateUser={setUser} onJoinRoom={handleJoinRoom} />
-        </div>
-      </motion.div >
 
-      {view === 'lobby' ? (
+      {/* 2. LOBBY VIEW */}
+      {view === 'lobby' && (
         <motion.div
           className="lobby-container"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
         >
-          <div className="lobby-header">
-            <h1>Welcome back, {user.username}!</h1>
-            <p>Ready to create some masterpieces?</p>
-          </div>
+          {/* LEFT SIDE - Social Club (Fixed) */}
+          <motion.div
+            className="lobby-social-panel"
+            initial={{ x: -100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <div className="social-panel-header">
+              <h2>Friends & Community</h2>
+            </div>
+            <Social socket={socket} user={user} onUpdateUser={setUser} onJoinFriend={handleJoinRoom} />
+          </motion.div>
 
-          <div className="lobby-grid">
-            <div className="lobby-section rooms">
+          {/* RIGHT/CENTER SIDE - Main Content */}
+          <div className="lobby-main-content">
+            {/* Playful Floating Party Animation - Top */}
+            <motion.div
+              className="lobby-party-hero"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1 }}
+            >
+              <div className="party-scene">
+                {/* Floating Balloons */}
+                {[...Array(5)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className={`balloon balloon-${i + 1}`}
+                    animate={{
+                      y: [0, -40, 0],
+                      x: [0, i % 2 === 0 ? 20 : -20, 0],
+                      rotate: [0, 5, -5, 0]
+                    }}
+                    transition={{
+                      duration: 4 + i,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: i * 0.5
+                    }}
+                  >
+                    🎈
+                  </motion.div>
+                ))}
+
+                <div className="party-content">
+                  <motion.div
+                    className="party-face"
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    😊
+                  </motion.div>
+
+                  <div className="logo-group">
+                    <motion.h1
+                      className="party-title"
+                      animate={{
+                        color: ['#FF9A3D', '#FFD93D', '#FF6B6B', '#FF9A3D']
+                      }}
+                      transition={{ duration: 5, repeat: Infinity }}
+                    >
+                      DrawToGather
+                    </motion.h1>
+
+                    <motion.div
+                      className="shhh-bubble"
+                      animate={{
+                        opacity: [0, 1, 1, 0],
+                        scale: [0.5, 1.2, 1, 0.8],
+                        y: [0, -20, -30, -40]
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        repeatDelay: 2
+                      }}
+                    >
+                      🤫 Shhh... it's a masterpiece!
+                    </motion.div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Public Rooms Section (Smaller) */}
+            <motion.div
+              className="lobby-rooms-section"
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
               <div className="section-header">
                 <h2>Public Rooms</h2>
                 <button className="refresh-btn" onClick={fetchPublicRooms}>Refresh</button>
@@ -570,216 +1118,388 @@ function App() {
                 {publicRooms.length === 0 ? (
                   <div className="empty-state">
                     <p>No rooms active... be the first!</p>
-                    <button className="lobby-action-btn create" onClick={() => setShowCreateModal(true)}>
-                      <Plus size={20} /> Create Room
-                    </button>
                   </div>
                 ) : (
                   <div className="lobby-rooms-grid">
-                    {publicRooms.map(room => (
+                    {publicRooms.map((room, index) => (
                       <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        key={room.roomId}
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
+                        whileHover={{ scale: 1.05, y: -5 }}
+                        key={room.roomId || room.id}
                         className="lobby-room-card"
-                        onClick={() => handleJoinRoom(room.roomId)}
+                        onClick={() => handleJoinRoom(room.roomId || room.id)}
+                        style={{
+                          background: room.theme?.background || 'linear-gradient(135deg, #FF6B6B 0%, #FFE66D 50%, #4ECDC4 100%)',
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}
                       >
-                        <div className="room-details">
-                          <span className="name">{room.name}</span>
-                          <span className="creator">by {room.creator?.username}</span>
-                        </div>
-                        <div className="room-join">
-                          <span className="id">#{room.roomId}</span>
-                          <button className="join-pill">Join</button>
+                        <div style={{
+                          position: 'absolute',
+                          inset: 0,
+                          background: 'rgba(255, 255, 255, 0.95)',
+                          backdropFilter: 'blur(10px)'
+                        }} />
+                        <div style={{ position: 'relative', zIndex: 1 }}>
+                          <div className="room-details">
+                            <span className="name">{room.name}</span>
+                            <span className="creator">by {room.creator?.username || room.creator || 'System'}</span>
+                          </div>
+                          <div className="room-join">
+                            <span className="id" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <Users size={14} />
+                              {room.players || 0}/10
+                            </span>
+                            <button className="join-pill">Join</button>
+                          </div>
                         </div>
                       </motion.div>
                     ))}
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
 
-            <div className="lobby-section social">
-              <div className="section-header">
-                <h2>Social Club</h2>
-              </div>
-              <Social user={user} onUpdateUser={setUser} onJoinFriend={handleJoinRoom} />
-            </div>
-          </div>
-
-          <div className="lobby-footer-actions">
-            <button className="lobby-big-btn create" onClick={() => setShowCreateModal(true)}>
-              <Plus size={24} />
-              <span>Create New Room</span>
-            </button>
-            <button className="lobby-big-btn join" onClick={() => setShowJoinModal(true)}>
-              <Users size={24} />
-              <span>Join by ID</span>
-            </button>
+            {/* Action Buttons - Bottom */}
+            <motion.div
+              className="lobby-action-buttons"
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.7 }}
+            >
+              <motion.button
+                whileHover={{ scale: 1.08, y: -3 }}
+                whileTap={{ scale: 0.95 }}
+                className="lobby-action-btn create-new"
+                onClick={() => setShowCreateModal(true)}
+              >
+                <Plus size={22} /> Create New Room
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.08, y: -3 }}
+                whileTap={{ scale: 0.95 }}
+                className="lobby-action-btn join-id"
+                onClick={() => setShowJoinModal(true)}
+              >
+                <Users size={22} /> Join by ID
+              </motion.button>
+            </motion.div>
           </div>
         </motion.div>
-      ) : (
-        <>
-          {/* Canvas Area */}
-          <div className="canvas-wrapper">
-            <canvas
-              onMouseDown={startDrawing}
-              onMouseUp={finishDrawing}
-              onMouseMove={handleMouseMove}
-              ref={canvasRef}
-              className={`drawing-canvas ${isEyedropper ? 'eyedropper-active' : ''}`}
-            />
+      )}
 
-            {Object.entries(remoteCursors).map(([id, pos]) => (
-              <motion.div
-                key={id}
-                className="remote-cursor"
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  pointerEvents: 'none'
-                }}
-                animate={{ x: pos.x, y: pos.y }}
-                transition={{ type: 'spring', damping: 30, stiffness: 250 }}
-              >
-                <div className="cursor-pencil" />
-                <span className="cursor-label">{pos.username}</span>
-              </motion.div>
-            ))}
+      {/* 3. ROOM VIEW - INTEGRATED WITH EXISTING TOP BAR */}
+      {view === 'canvas' && (
+        <div className="room-layout">
+          {/* Background with Theme Particles */}
+          <div
+            className="room-background"
+            style={{
+              background: roomTheme?.background || 'linear-gradient(135deg, #FFE66D 0%, #FFA500 50%, #FFD700 100%)'
+            }}
+          >
+            <ThemeAmbient theme={roomTheme} />
           </div>
 
-          {/* Left Tools Sidebar */}
-          <motion.div
-            className="tools-sidebar"
-            initial={{ x: -100 }}
-            animate={{ x: 0 }}
-          >
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className={`tool-btn ${!isEraser && !isEyedropper ? 'active' : ''}`}
-              onClick={() => {
-                setIsEraser(false);
-                setIsEyedropper(false);
-              }}
-              title="Pencil"
-            >
-              <Pencil size={24} />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className={`tool-btn ${isEraser ? 'active' : ''}`}
-              onClick={() => {
-                setIsEraser(true);
-                setIsEyedropper(false);
-              }}
-              title="Eraser"
-            >
-              <Eraser size={24} />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className={`tool-btn ${isEyedropper ? 'active' : ''}`}
-              onClick={() => {
-                setIsEyedropper(true);
-                setIsEraser(false);
-              }}
-              title="Eyedropper"
-            >
-              <Pipette size={24} />
-            </motion.button>
-            <div className="sidebar-divider" />
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="tool-btn clear"
-              onClick={clearCanvas}
-              title="Clear Canvas"
-            >
-              <Trash2 size={24} />
-            </motion.button>
-          </motion.div>
+          {/* Main Room Container */}
+          <div className="room-main-container">
+            {/* Left Sidebar - Tools, Colors, Chat */}
+            <div className="room-left-sidebar" onClick={() => { setShowMusicPlayer(false); setShowNotifications(false); }}>
+              {/* 1st: Group Chat - Higher priority */}
+              <div className="sidebar-section chat-section">
+                <span className="sidebar-title">
+                  <MessageSquare size={18} /> Group Chat
+                </span>
+                <div className="chat-container-fixed">
+                  <RoomChat socket={socket} roomId={roomId} user={user} />
+                </div>
+              </div>
 
-          {/* Bottom Properties Bar */}
-          <motion.div
-            className="properties-bar"
-            initial={{ y: 100 }}
-            animate={{ y: 0 }}
-          >
-            <div className="properties-section">
-              <div className="color-palette">
-                {colorPalette.map((paletteColor) => (
-                  <motion.button
-                    key={paletteColor}
-                    whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.9 }}
-                    className={`color-swatch-small ${color === paletteColor ? 'active' : ''}`}
-                    style={{ backgroundColor: paletteColor }}
-                    onClick={() => {
-                      setColor(paletteColor);
-                      setIsEraser(false);
-                      setIsEyedropper(false);
-                    }}
-                    title={paletteColor}
-                  />
-                ))}
-              </div>
-              <div className="vertical-divider" />
-              <div className="color-picker-wrapper">
-                <input
-                  type="color"
-                  value={color}
-                  onChange={(e) => {
-                    setColor(e.target.value);
-                    setIsEraser(false);
-                    setIsEyedropper(false);
-                  }}
-                  disabled={isEraser}
-                  title="Custom Color"
-                />
-              </div>
-              <div className="vertical-divider" />
-              <div className="brush-slider-wrapper">
-                <span className="slider-label">Size: {brushSize}px</span>
-                <input
-                  type="range"
-                  min="1"
-                  max="50"
-                  value={brushSize}
-                  onChange={(e) => setBrushSize(e.target.value)}
-                />
+              {/* 2nd: Color Palette & Shades */}
+              <div className="sidebar-section">
+                <span className="sidebar-title">
+                  <Pipette size={18} /> Color Palette
+                </span>
+                <div className="color-palette-compact">
+                  <div className="color-grid-compact">
+                    {colorPalette.map(c => (
+                      <motion.button
+                        key={c}
+                        whileHover={{ scale: 1.15 }}
+                        whileTap={{ scale: 0.9 }}
+                        className={`color-dot-small ${color === c ? 'selected' : ''}`}
+                        style={{ backgroundColor: c }}
+                        onClick={() => {
+                          setColor(c);
+                          setColorShades(generateColorShades(c));
+                          setIsEraser(false);
+                          setIsEyedropper(false);
+                        }}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Color Shades - Gradient Bar */}
+                  <div className="shades-compact" style={{ marginTop: '15px' }}>
+                    <div
+                      className="shades-grid-compact"
+                      onClick={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const percentage = x / rect.width;
+
+                        // Get the base color from palette
+                        const baseColor = colorPalette.find(c => {
+                          const shades = generateColorShades(c);
+                          return shades.includes(color);
+                        }) || color;
+
+                        // Generate shade based on click position
+                        const shades = generateColorShades(baseColor);
+                        const index = Math.round(percentage * (shades.length - 1));
+                        const selectedShade = shades[Math.max(0, Math.min(index, shades.length - 1))];
+
+                        setColor(selectedShade);
+                        setIsEraser(false);
+                        setIsEyedropper(false);
+                      }}
+                    >
+                      <div
+                        className="shade-gradient-bar"
+                        style={{
+                          color: colorPalette.find(c => {
+                            const shades = generateColorShades(c);
+                            return shades.includes(color);
+                          }) || color
+                        }}
+                      >
+                        <div
+                          className="shade-selector"
+                          style={{
+                            left: (() => {
+                              const baseColor = colorPalette.find(c => {
+                                const shades = generateColorShades(c);
+                                return shades.includes(color);
+                              }) || color;
+                              const shades = generateColorShades(baseColor);
+                              const index = shades.indexOf(color);
+                              return `${(index / (shades.length - 1)) * 100}%`;
+                            })()
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </motion.div>
 
-          {/* Side Actions */}
-          <div className="side-actions">
-            <motion.button
-              whileHover={{ x: -5 }}
-              className={`side-btn social ${showSocial ? 'active' : ''}`}
-              onClick={() => setShowSocial(!showSocial)}
-            >
-              <Users size={24} />
-              <span>Social</span>
-            </motion.button>
-            <motion.button
-              whileHover={{ x: -5 }}
-              className="side-btn lobby"
-              onClick={() => setView('lobby')}
-            >
-              <Plus size={24} />
-              <span>Lobby</span>
-            </motion.button>
+            {/* Center Canvas Area */}
+            <div className="room-canvas-area" onClick={() => { setShowMusicPlayer(false); setShowNotifications(false); }}>
+              <motion.div
+                className="canvas-frame"
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                style={{
+                  borderColor: roomTheme?.primaryColor || '#FFA500'
+                }}
+              >
+                <canvas
+                  ref={canvasRef}
+                  onMouseDown={startDrawing}
+                  onMouseUp={finishDrawing}
+                  onMouseMove={handleMouseMove}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  onMouseEnter={() => setLocalCursor(prev => ({ ...prev, show: true }))}
+                  onMouseLeave={() => setLocalCursor(prev => ({ ...prev, show: false }))}
+                  className={`the-canvas ${isEyedropper ? 'cursor-eyedropper' : ''} ${localCursor.show ? 'hide-default-cursor' : ''}`}
+                />
+
+                {/* Remote Cursors Overlay */}
+                <div className="cursors-layer">
+                  {/* Local Brush Preview */}
+                  {localCursor.show && !isEyedropper && (
+                    <div
+                      className="local-brush-preview"
+                      style={{
+                        left: (localCursor.x / VIRTUAL_SIZE) * 100 + "%",
+                        top: (localCursor.y / VIRTUAL_SIZE) * 100 + "%",
+                        width: (brushSize / VIRTUAL_SIZE) * 100 + "%",
+                        height: (brushSize / VIRTUAL_SIZE) * 100 + "%",
+                        background: isEraser ? '#ffffff' : color,
+                        border: `2px solid ${isEraser ? '#ccc' : 'rgba(0,0,0,0.2)'}`,
+                      }}
+                    />
+                  )}
+                  {Object.entries(remoteCursors).map(([id, pos]) => (
+                    <div
+                      key={id}
+                      className="remote-cursor"
+                      style={{
+                        left: (pos.x / VIRTUAL_SIZE) * 100 + "%",
+                        top: (pos.y / VIRTUAL_SIZE) * 100 + "%"
+                      }}
+                    >
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M5 3L19 12L12 13L9 21L5 3Z"
+                          fill={roomTheme?.primaryColor || '#FFA500'}
+                          stroke="white"
+                          strokeWidth="2"
+                        />
+                      </svg>
+                      <span className="cursor-label">{pos.username}</span>
+                    </div>
+                  ))}
+                </div>
+
+              </motion.div>
+
+              {/* BOTTOM FLOATING TOOLBAR - Now outside the frame but centered with it */}
+              <div className="canvas-bottom-toolbar-container">
+                <div className="canvas-bottom-toolbar">
+                  <div className="toolbar-group brushes">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className={`tool-btn-floating ${!isEraser && !isEyedropper && brushType === 'pencil' ? 'active' : ''}`}
+                      onClick={() => { setBrushType('pencil'); setIsEraser(false); setIsEyedropper(false); }}
+                      title="Pencil"
+                    >
+                      <Pencil size={20} />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className={`tool-btn-floating ${!isEraser && !isEyedropper && brushType === 'marker' ? 'active' : ''}`}
+                      onClick={() => { setBrushType('marker'); setIsEraser(false); setIsEyedropper(false); }}
+                      title="Marker"
+                    >
+                      <Pen size={20} />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className={`tool-btn-floating ${!isEraser && !isEyedropper && brushType === 'spray' ? 'active' : ''}`}
+                      onClick={() => { setBrushType('spray'); setIsEraser(false); setIsEyedropper(false); }}
+                      title="Spray"
+                    >
+                      <Cloud size={20} />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className={`tool-btn-floating ${isEraser ? 'active' : ''}`}
+                      onClick={() => { setIsEraser(true); setIsEyedropper(false); }}
+                      title="Eraser"
+                    >
+                      <Eraser size={20} />
+                    </motion.button>
+                  </div>
+
+                  <div className="toolbar-divider" />
+
+                  <div className="toolbar-group slider-group">
+                    <div className="brush-dot-preview-mini" style={{ background: isEraser ? '#fff' : color, border: isEraser ? '2px solid #ccc' : 'none' }} />
+                    <input
+                      type="range"
+                      min="1"
+                      max="60"
+                      value={brushSize}
+                      onChange={(e) => setBrushSize(e.target.value)}
+                      className="canvas-brush-slider"
+                    />
+                    <span className="brush-size-label">{brushSize}px</span>
+                  </div>
+
+                  <div className="toolbar-divider" />
+
+                  <div className="toolbar-group utility">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className={`tool-btn-floating ${isEyedropper ? 'active' : ''}`}
+                      onClick={() => { setIsEyedropper(true); setIsEraser(false); }}
+                      title="Color Picker"
+                    >
+                      <Pipette size={20} />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="tool-btn-floating clear"
+                      onClick={clearCanvas}
+                      title="Clear Canvas"
+                    >
+                      <Trash2 size={20} />
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Sidebar - Theme, Music, Members, Actions */}
+            <div className="room-right-sidebar">
+              {/* 1st: Room Theme */}
+              <div className="sidebar-section">
+                <span className="sidebar-title">
+                  <Zap size={18} /> Room Theme
+                </span>
+                <ThemeSelector
+                  socket={socket}
+                  roomId={roomId}
+                  currentTheme={roomTheme}
+                  isHost={true} // EVERYONE CAN CHANGE THEME
+                />
+              </div>
+
+              {/* 2nd: Room Members - Stretches to fill space */}
+              <div className="sidebar-section members-section">
+                <span className="sidebar-title">
+                  <Users size={18} /> Room Members
+                </span>
+                <div className="members-container-fixed">
+                  <RoomPlayers roomId={roomId} currentUserId={user?.id || user?._id} />
+                </div>
+              </div>
+
+              {/* 3rd: Quick Actions - At the bottom */}
+              <div className="sidebar-section">
+                <span className="sidebar-title">
+                  <Zap size={18} /> Quick Actions
+                </span>
+                <div className="action-buttons-grid">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="action-btn share"
+                    onClick={() => setShowShareModal(true)}
+                  >
+                    <Share2 size={18} />
+                    <span>Share Room</span>
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="action-btn save"
+                    onClick={() => setShowExport(true)}
+                  >
+                    <Download size={18} />
+                    <span>Save Drawing</span>
+                  </motion.button>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+      )}
 
-          {/* Room Players Sidebar */}
-          <RoomPlayers roomId={roomId} currentUserId={user?.id || user?._id} />
-        </>
-      )
-      }
-
+      {/* 4. MODALS & OVERLAYS */}
       <AnimatePresence>
         {showSocial && (
           <motion.div
@@ -796,41 +1516,19 @@ function App() {
             <Social user={user} onUpdateUser={setUser} onJoinFriend={handleJoinRoom} />
           </motion.div>
         )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {showCreateModal && (
-          <div className="modal-overlay">
-            <motion.div
-              className="modal-content"
-              initial={{ scale: 0.5, opacity: 0, y: 100 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.5, opacity: 0, y: 100 }}
-            >
-              <div className="modal-header">
-                <h2>New Room!</h2>
-                <button className="close-btn" onClick={() => setShowCreateModal(false)}><X /></button>
-              </div>
-              <p className="modal-desc">Creating a room costs 10 credits!</p>
-              <input
-                type="text"
-                placeholder="Name your room..."
-                value={newRoomName}
-                onChange={(e) => setNewRoomName(e.target.value)}
-                className="modal-input"
-              />
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="confirm-btn"
-                onClick={handleCreateRoom}
-              >
-                Let's Go! (10 🪙)
-              </motion.button>
-            </motion.div>
-          </div>
+        {showDailyRewards && (
+          <DailyRewards
+            user={user}
+            onClose={() => setShowDailyRewards(false)}
+            onUpdateUser={setUser}
+          />
         )}
-
+        {showCreateModal && (
+          <CreateRoomModal
+            onClose={() => setShowCreateModal(false)}
+            onCreate={handleCreateRoom}
+          />
+        )}
         {showJoinModal && (
           <div className="modal-overlay">
             <motion.div
@@ -843,6 +1541,10 @@ function App() {
                 <h2>Join Room</h2>
                 <button className="close-btn" onClick={() => setShowJoinModal(false)}><X /></button>
               </div>
+
+              <p className="modal-desc" style={{ fontSize: '0.9rem', color: '#666' }}>
+                💡 Paste the Room ID without the # symbol
+              </p>
 
               <div className="join-input-group">
                 <input
@@ -950,7 +1652,367 @@ function App() {
         )}
       </AnimatePresence>
 
-      {/* Toast Notifications */}
+      <AnimatePresence>
+        {showExport && (
+          <DrawingExport
+            canvasRef={canvasRef}
+            user={user}
+            onClose={() => setShowExport(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showShareModal && (
+          <motion.div
+            className="modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowShareModal(false)}
+          >
+            <motion.div
+              className="modal-content"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxWidth: '400px' }}
+            >
+              <div className="modal-header">
+                <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.3rem' }}>
+                  <Share2 size={24} />
+                  Share Room
+                </h2>
+                <button className="modal-close" onClick={() => setShowShareModal(false)}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="modal-body" style={{ padding: '20px' }}>
+                <div style={{ marginBottom: '25px' }}>
+                  <label style={{ display: 'block', fontWeight: '800', fontSize: '0.9rem', color: '#2C2C2C', marginBottom: '10px' }}>
+                    Room Name
+                  </label>
+                  <div style={{
+                    background: '#FFFBEA',
+                    border: '3px solid #FFD93D',
+                    borderRadius: '15px',
+                    padding: '15px 20px',
+                    fontSize: '1.1rem',
+                    fontWeight: '700',
+                    color: '#2C2C2C',
+                    textAlign: 'center'
+                  }}>
+                    {roomName || 'Untitled Room'}
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '25px' }}>
+                  <label style={{ display: 'block', fontWeight: '800', fontSize: '0.9rem', color: '#2C2C2C', marginBottom: '10px' }}>
+                    Room ID
+                  </label>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <div style={{
+                      flex: 1,
+                      background: 'linear-gradient(135deg, #6C63FF 0%, #5A52E0 100%)',
+                      border: '3px solid #5A52E0',
+                      borderRadius: '15px',
+                      padding: '15px 20px',
+                      fontSize: '1rem',
+                      fontWeight: '800',
+                      color: 'white',
+                      textAlign: 'center',
+                      letterSpacing: '1px',
+                      fontFamily: 'monospace'
+                    }}>
+                      {roomId}
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        copyRoomId();
+                        showToast('Room ID copied!', 'success');
+                      }}
+                      style={{
+                        background: '#4ECDC4',
+                        border: '3px solid #3DBDB4',
+                        borderRadius: '15px',
+                        padding: '15px 20px',
+                        cursor: 'pointer',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 6px 0 #3DBDB4',
+                        transition: 'all 0.2s'
+                      }}
+                      title="Copy Room ID"
+                    >
+                      <Copy size={20} />
+                    </motion.button>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontWeight: '800', fontSize: '0.9rem', color: '#2C2C2C', marginBottom: '10px' }}>
+                    Share Link
+                  </label>
+                  <div style={{
+                    background: '#F5F5F5',
+                    border: '2px solid #E0E0E0',
+                    borderRadius: '12px',
+                    padding: '12px 15px',
+                    fontSize: '0.85rem',
+                    color: '#666',
+                    wordBreak: 'break-all',
+                    fontFamily: 'monospace'
+                  }}>
+                    {window.location.origin}/?join={roomId}
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '25px' }}>
+                  <label style={{ display: 'block', fontWeight: '800', fontSize: '0.9rem', color: '#2C2C2C', marginBottom: '12px' }}>
+                    Share Via
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        const shareText = `Join my drawing room "${roomName || 'Untitled Room'}"! Room ID: ${roomId}`;
+                        const shareUrl = `${window.location.origin}/?join=${roomId}`;
+                        window.open(`https://wa.me/?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`, '_blank');
+                      }}
+                      style={{
+                        background: '#25D366',
+                        border: '3px solid #1DA851',
+                        borderRadius: '12px',
+                        padding: '12px',
+                        color: 'white',
+                        fontWeight: '700',
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        boxShadow: '0 4px 0 #1DA851'
+                      }}
+                    >
+                      <MessageSquare size={18} />
+                      WhatsApp
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        const shareText = `Join my drawing room "${roomName || 'Untitled Room'}"! Room ID: ${roomId}`;
+                        const shareUrl = `${window.location.origin}/?join=${roomId}`;
+                        window.location.href = `mailto:?subject=${encodeURIComponent('Join my DrawTogether room!')}&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`;
+                      }}
+                      style={{
+                        background: '#EA4335',
+                        border: '3px solid #C5221F',
+                        borderRadius: '12px',
+                        padding: '12px',
+                        color: 'white',
+                        fontWeight: '700',
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        boxShadow: '0 4px 0 #C5221F'
+                      }}
+                    >
+                      📧 Email
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        const shareText = `Join my drawing room "${roomName || 'Untitled Room'}"!`;
+                        const shareUrl = `${window.location.origin}/?join=${roomId}`;
+                        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
+                      }}
+                      style={{
+                        background: '#1DA1F2',
+                        border: '3px solid #1A8CD8',
+                        borderRadius: '12px',
+                        padding: '12px',
+                        color: 'white',
+                        fontWeight: '700',
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        boxShadow: '0 4px 0 #1A8CD8'
+                      }}
+                    >
+                      🐦 Twitter
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        const shareUrl = `${window.location.origin}/?join=${roomId}`;
+                        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+                      }}
+                      style={{
+                        background: '#1877F2',
+                        border: '3px solid #166FE5',
+                        borderRadius: '12px',
+                        padding: '12px',
+                        color: 'white',
+                        fontWeight: '700',
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        boxShadow: '0 4px 0 #166FE5'
+                      }}
+                    >
+                      👍 Facebook
+                    </motion.button>
+                  </div>
+                </div>
+
+                <div style={{
+                  marginTop: '25px',
+                  padding: '15px',
+                  background: '#FFF9E6',
+                  borderRadius: '12px',
+                  border: '2px solid #FFD93D',
+                  fontSize: '0.85rem',
+                  color: '#666',
+                  textAlign: 'center'
+                }}>
+                  💡 Share the Room ID with friends so they can join!
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Leave Confirmation Modal */}
+      <AnimatePresence>
+        {showLeaveModal && (
+          <motion.div
+            className="modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowLeaveModal(false)}
+          >
+            <motion.div
+              className="modal-content"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxWidth: '400px' }}
+            >
+              <div className="modal-header">
+                <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.3rem' }}>
+                  <LogOut size={24} />
+                  Leave Room?
+                </h2>
+                <button className="modal-close" onClick={() => setShowLeaveModal(false)}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="modal-body" style={{ padding: '20px' }}>
+                <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+                  <p style={{ fontSize: '1rem', color: '#2C2C2C', marginBottom: '15px' }}>
+                    Are you sure you want to leave <strong>"{roomName}"</strong>?
+                  </p>
+
+                  {roomPlayers.length > 1 && roomPlayers[0]?.id === user?.id && (
+                    <div style={{
+                      padding: '12px',
+                      background: '#FFF9E6',
+                      borderRadius: '10px',
+                      border: '2px solid #FFD93D',
+                      fontSize: '0.85rem',
+                      color: '#666'
+                    }}>
+                      ⚠️ You are the host. The next player will become the new host.
+                    </div>
+                  )}
+
+                  {roomPlayers.length === 1 && (
+                    <div style={{
+                      padding: '12px',
+                      background: '#FFE8E8',
+                      borderRadius: '10px',
+                      border: '2px solid #FF6B6B',
+                      fontSize: '0.85rem',
+                      color: '#666'
+                    }}>
+                      ⚠️ You are the only player. The room will be deleted.
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setShowLeaveModal(false)}
+                    style={{
+                      flex: 1,
+                      background: 'white',
+                      border: '3px solid #E0E0E0',
+                      borderRadius: '12px',
+                      padding: '12px',
+                      fontWeight: '700',
+                      fontSize: '0.95rem',
+                      cursor: 'pointer',
+                      color: '#666'
+                    }}
+                  >
+                    Cancel
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={confirmLeaveRoom}
+                    style={{
+                      flex: 1,
+                      background: '#FF6B6B',
+                      border: '3px solid #E85555',
+                      borderRadius: '12px',
+                      padding: '12px',
+                      fontWeight: '700',
+                      fontSize: '0.95rem',
+                      cursor: 'pointer',
+                      color: 'white',
+                      boxShadow: '0 4px 0 #E85555'
+                    }}
+                  >
+                    Leave Room
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Toast toasts={toasts} onRemove={removeToast} />
     </div >
   );

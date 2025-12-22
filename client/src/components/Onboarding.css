@@ -332,3 +332,57 @@
     padding: 10px;
     border-radius: 12px;
 }
+
+/* Country Selection Styles */
+.countries-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.country-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: #f5f5f5;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #444;
+    transition: all 0.2s ease;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.country-option:hover {
+    background: #fffdf9;
+    border-color: #ffeeb0;
+    transform: translateY(-2px);
+}
+
+.country-option.selected {
+    background: #FFF4A3;
+    border-color: #FFD93D;
+    color: #2C2C2C;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Custom Scrollbar for countries */
+.countries-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.countries-grid::-webkit-scrollbar-thumb {
+    background-color: #eee;
+    border-radius: 3px;
+}
+
+.countries-grid::-webkit-scrollbar-track {
+    background-color: transparent;
+}
