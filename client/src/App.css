@@ -1519,6 +1519,66 @@ body {
     display: none !important;
     /* Hide room ID in small top bar */
   }
+
+  /* Lobby Switching Logic */
+  .lobby-container {
+    height: calc(100dvh - 80px) !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+  }
+
+  .lobby-main-content,
+  .lobby-social-panel {
+    display: none !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    width: 100% !important;
+    padding: 15px !important;
+  }
+
+  .lobby-active-main .lobby-main-content {
+    display: block !important;
+  }
+
+  .lobby-active-social .lobby-social-panel {
+    display: block !important;
+    background: #FFF9E6 !important;
+  }
+
+  /* Bottom Nav for Lobby */
+  .mobile-lobby-nav {
+    display: flex !important;
+    height: 70px !important;
+    background: white !important;
+    border-top: 4px solid #FFD93D !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    z-index: 1000 !important;
+    order: 2 !important;
+    /* Move to bottom */
+  }
+}
+
+/* 334px Lobby Specifics */
+@media (max-width: 350px) {
+  .party-title {
+    font-size: 1.8rem !important;
+  }
+
+  .lobby-header h1 {
+    font-size: 1.4rem !important;
+  }
+
+  .lobby-action-btn {
+    padding: 10px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .lobby-room-card {
+    padding: 12px !important;
+  }
 }
 
 /* Hide bubbles on small screens to save space */

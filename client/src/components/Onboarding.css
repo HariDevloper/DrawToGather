@@ -383,6 +383,59 @@
     border-radius: 3px;
 }
 
-.countries-grid::-webkit-scrollbar-track {
-    background-color: transparent;
+@media (max-width: 400px) {
+    .onboarding-card {
+        padding: 1.5rem;
+        border-radius: 30px;
+    }
+
+    .onboarding-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .step-dot {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+
+    .step-line {
+        width: 15px;
+    }
+}
+
+@media (max-width: 350px) {
+    .onboarding-card {
+        padding: 1rem;
+        min-height: auto;
+        height: 90vh;
+    }
+
+    .input-group label {
+        font-size: 1rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .avatars-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+
+    .preview-large {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 15px;
+    }
+
+    .countries-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-buttons {
+        margin-top: 1rem;
+    }
+
+    .next-btn {
+        font-size: 1rem;
+    }
 }

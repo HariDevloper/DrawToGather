@@ -62,7 +62,7 @@ const Auth = ({ onLogin }) => {
                                 theme="filled_blue"
                                 shape="pill"
                                 size="large"
-                                width="340"
+                                width={window.innerWidth < 400 ? "280" : "340"}
                                 text="continue_with"
                             />
                         </div>

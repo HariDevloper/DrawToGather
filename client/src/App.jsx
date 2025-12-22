@@ -22,7 +22,7 @@ import {
   X, LogOut, RefreshCw, Pipette, User as UserIcon,
   Gift, Save, Zap, Copy, ChevronLeft, ChevronRight,
   ChevronUp, ChevronDown, Share2, Maximize, MessageSquare, Download,
-  Pen, Cloud, Music, Bell, Play, Pause, SkipBack, SkipForward, Check
+  Pen, Cloud, Music, Bell, Play, Pause, SkipBack, SkipForward, Check, Home
 } from 'lucide-react';
 import './App.css';
 import './room_layout.css';
@@ -79,6 +79,8 @@ function App() {
   const [toolsExpanded, setToolsExpanded] = useState(true);
   const [propertiesExpanded, setPropertiesExpanded] = useState(true);
   const [localCursor, setLocalCursor] = useState({ x: 0, y: 0, show: false });
+  const [mobileActiveTab, setMobileActiveTab] = useState('canvas'); // 'canvas', 'chat', 'tools'
+  const [lobbyActiveTab, setLobbyActiveTab] = useState('main'); // 'main', 'social'
 
   // Music Player State
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
@@ -1014,11 +1016,29 @@ function App() {
       {/* 2. LOBBY VIEW */}
       {view === 'lobby' && (
         <motion.div
-          className="lobby-container"
+          className={`lobby-container lobby-active-${lobbyActiveTab}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
+          {/* Mobile Lobby Navigation */}
+          <div className="mobile-lobby-nav">
+            <button
+              className={`mobile-nav-item ${lobbyActiveTab === 'main' ? 'active' : ''}`}
+              onClick={() => setLobbyActiveTab('main')}
+            >
+              <Home size={20} />
+              <span>Rooms</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${lobbyActiveTab === 'social' ? 'active' : ''}`}
+              onClick={() => setLobbyActiveTab('social')}
+            >
+              <Users size={20} />
+              <span>Friends</span>
+            </button>
+          </div>
+
           {/* LEFT SIDE - Social Club (Fixed) */}
           <motion.div
             className="lobby-social-panel"
@@ -1203,8 +1223,33 @@ function App() {
             <ThemeAmbient theme={roomTheme} />
           </div>
 
+          {/* Mobile Bottom Navigation - Only visible on small vertical screens */}
+          <div className="mobile-room-nav">
+            <button
+              className={`mobile-nav-item ${mobileActiveTab === 'canvas' ? 'active' : ''}`}
+              onClick={() => setMobileActiveTab('canvas')}
+            >
+              <Pencil size={20} />
+              <span>Canvas</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${mobileActiveTab === 'chat' ? 'active' : ''}`}
+              onClick={() => setMobileActiveTab('chat')}
+            >
+              <MessageSquare size={20} />
+              <span>Chat</span>
+            </button>
+            <button
+              className={`mobile-nav-item ${mobileActiveTab === 'tools' ? 'active' : ''}`}
+              onClick={() => setMobileActiveTab('tools')}
+            >
+              <Zap size={20} />
+              <span>Tools</span>
+            </button>
+          </div>
+
           {/* Main Room Container */}
-          <div className="room-main-container">
+          <div className={`room-main-container mobile-active-${mobileActiveTab}`}>
             {/* Left Sidebar - Tools, Colors, Chat */}
             <div className="room-left-sidebar" onClick={() => { setShowMusicPlayer(false); setShowNotifications(false); }}>
               {/* 1st: Group Chat - Higher priority */}
@@ -1229,7 +1274,7 @@ function App() {
                         key={c}
                         whileHover={{ scale: 1.15 }}
                         whileTap={{ scale: 0.9 }}
-                        className={`color-dot-small ${color === c ? 'selected' : ''}`}
+                        className={`color-dot-small ${color === c ? 'active' : ''}`}
                         style={{ backgroundColor: c }}
                         onClick={() => {
                           setColor(c);
@@ -1269,10 +1314,10 @@ function App() {
                       <div
                         className="shade-gradient-bar"
                         style={{
-                          color: colorPalette.find(c => {
+                          background: `linear-gradient(to right, ${generateColorShades(colorPalette.find(c => {
                             const shades = generateColorShades(c);
                             return shades.includes(color);
-                          }) || color
+                          }) || color).join(', ')})`
                         }}
                       >
                         <div

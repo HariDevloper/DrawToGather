@@ -1,11 +1,13 @@
 html,
 body,
 #root {
-    height: 100% !important;
+    height: 100dvh !important;
     width: 100% !important;
     overflow: hidden !important;
     margin: 0 !important;
     padding: 0 !important;
+    position: fixed !important;
+    /* Prevents pull-to-refresh and scroll */
 }
 
 /* ===== ROOM LAYOUT - FULLSCREEN PREMIUM REDESIGN ===== */
@@ -569,51 +571,129 @@ body,
     }
 }
 
-/* Mobile Vertical Optimization (Room) */
+/* Mobile Portrait - Section Switching (No Scroll) */
 @media (max-width: 600px) and (orientation: portrait) {
     .room-layout {
-        height: auto !important;
-        overflow-y: auto !important;
-        display: block !important;
+        height: calc(100dvh - 80px) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
     }
 
     .room-main-container {
-        flex-direction: column !important;
+        flex: 1 !important;
         height: auto !important;
-        overflow-y: visible !important;
+        display: block !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+
+    /* Dynamic Switching Logic */
+    .room-left-sidebar,
+    .room-right-sidebar,
+    .room-canvas-area {
+        display: none !important;
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    /* Show only active section */
+    .mobile-active-canvas .room-canvas-area {
+        display: flex !important;
+    }
+
+    .mobile-active-chat .room-left-sidebar {
+        display: flex !important;
+    }
+
+    .mobile-active-tools .room-right-sidebar {
+        display: flex !important;
+    }
+
+    /* Sidebar adjustments for full-screen switch */
+    .room-left-sidebar,
+    .room-right-sidebar {
+        background: #FFF9E6 !important;
+        border: none !important;
+        z-index: 50 !important;
+    }
+
+    .sidebar-section.chat-section {
+        height: 100% !important;
     }
 
     .room-canvas-area {
-        padding: 20px 10px !important;
-        height: auto !important;
-        width: 100vw !important;
+        padding: 10px !important;
+        z-index: 40 !important;
     }
 
     .canvas-frame {
         width: 100% !important;
-        height: calc(100vw - 20px) !important;
-        /* Force square relative to width */
-        max-width: 100% !important;
-        max-height: 100% !important;
-    }
-
-    .room-left-sidebar,
-    .room-right-sidebar {
-        width: 100% !important;
         height: auto !important;
-        border: none !important;
-        border-top: 5px solid #FFD93D !important;
+        aspect-ratio: 1/1 !important;
     }
 
-    .sidebar-section {
-        border-bottom: 3px solid #FFD93D !important;
+    /* Bottom Nav Styles */
+    .mobile-room-nav {
+        display: flex !important;
+        height: 70px !important;
+        background: white !important;
+        border-top: 4px solid #FFD93D !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        z-index: 1000 !important;
+        padding-bottom: env(safe-area-inset-bottom) !important;
+    }
+
+    .mobile-nav-item {
+        background: transparent !important;
+        border: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 4px !important;
+        color: #888 !important;
+        font-weight: 800 !important;
+        font-size: 0.75rem !important;
+        padding: 10px !important;
+        transition: all 0.2s !important;
+    }
+
+    .mobile-nav-item.active {
+        color: #FF9A3D !important;
+        transform: translateY(-5px) !important;
+    }
+
+    .mobile-nav-item.active svg {
+        background: #FFD93D !important;
+        padding: 8px !important;
+        border-radius: 12px !important;
+        width: 40px !important;
+        height: 40px !important;
+        color: white !important;
+    }
+}
+
+/* 334px Mini-Phone Fixes */
+@media (max-width: 350px) {
+    .logo {
+        font-size: 1.1rem !important;
+    }
+
+    .stat-pill {
+        width: 32px !important;
+        height: 32px !important;
     }
 
     .canvas-bottom-toolbar {
-        position: static !important;
-        margin-top: 15px !important;
-        width: 100% !important;
-        justify-content: space-around !important;
+        scale: 0.8 !important;
+        transform-origin: bottom center !important;
+    }
+
+    .mobile-nav-item span {
+        display: none !important;
     }
 }
 
