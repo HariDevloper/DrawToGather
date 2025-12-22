@@ -115,6 +115,7 @@
     transition: all 0.2s;
     background: #FFFBEA;
     height: 32px;
+    color: #2C2C2C !important;
 }
 
 .chat-input:focus {
@@ -141,7 +142,7 @@
 .chat-send-btn svg {
     color: white !important;
     stroke: white !important;
-    fill: none !important;
+    fill: white !important;
 }
 
 .chat-send-btn:hover:not(:disabled) {

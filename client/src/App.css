@@ -1580,20 +1580,28 @@ body {
 /* 334px Lobby Specifics */
 @media (max-width: 350px) {
   .party-title {
-    font-size: 1.8rem !important;
+    font-size: 1.5rem !important;
   }
 
-  .lobby-header h1 {
-    font-size: 1.4rem !important;
+  .party-face {
+    font-size: 1.5rem !important;
+  }
+
+  .lobby-party-hero {
+    padding: 10px 0 !important;
+  }
+
+  .lobby-rooms-section h2 {
+    font-size: 1.1rem !important;
+  }
+
+  .lobby-action-buttons {
+    gap: 8px !important;
   }
 
   .lobby-action-btn {
-    padding: 10px !important;
-    font-size: 0.9rem !important;
-  }
-
-  .lobby-room-card {
-    padding: 12px !important;
+    padding: 8px 12px !important;
+    font-size: 0.8rem !important;
   }
 }
 

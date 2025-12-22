@@ -858,7 +858,7 @@ function App() {
       <motion.nav
         className="top-bar"
       >
-        <div className="logo" onClick={() => setView('lobby')} style={{ cursor: 'pointer' }}>DrawToGather</div>
+        <div className="logo brand-logo" onClick={() => setView('lobby')} style={{ cursor: 'pointer' }}>DrawToGather</div>
 
         <div className="top-stats">
 
@@ -1402,81 +1402,85 @@ function App() {
               {/* BOTTOM FLOATING TOOLBAR - Now outside the frame but centered with it */}
               <div className="canvas-bottom-toolbar-container">
                 <div className="canvas-bottom-toolbar">
-                  <div className="toolbar-group brushes">
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className={`tool-btn-floating ${!isEraser && !isEyedropper && brushType === 'pencil' ? 'active' : ''}`}
-                      onClick={() => { setBrushType('pencil'); setIsEraser(false); setIsEyedropper(false); }}
-                      title="Pencil"
-                    >
-                      <Pencil size={20} />
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className={`tool-btn-floating ${!isEraser && !isEyedropper && brushType === 'marker' ? 'active' : ''}`}
-                      onClick={() => { setBrushType('marker'); setIsEraser(false); setIsEyedropper(false); }}
-                      title="Marker"
-                    >
-                      <Pen size={20} />
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className={`tool-btn-floating ${!isEraser && !isEyedropper && brushType === 'spray' ? 'active' : ''}`}
-                      onClick={() => { setBrushType('spray'); setIsEraser(false); setIsEyedropper(false); }}
-                      title="Spray"
-                    >
-                      <Cloud size={20} />
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className={`tool-btn-floating ${isEraser ? 'active' : ''}`}
-                      onClick={() => { setIsEraser(true); setIsEyedropper(false); }}
-                      title="Eraser"
-                    >
-                      <Eraser size={20} />
-                    </motion.button>
+                  {/* Top Row: Brushes */}
+                  <div className="toolbar-row tools-row">
+                    <div className="toolbar-group brushes">
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className={`tool-btn-floating ${!isEraser && !isEyedropper && brushType === 'pencil' ? 'active' : ''}`}
+                        onClick={() => { setBrushType('pencil'); setIsEraser(false); setIsEyedropper(false); }}
+                        title="Pencil"
+                      >
+                        <Pencil size={20} />
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className={`tool-btn-floating ${!isEraser && !isEyedropper && brushType === 'marker' ? 'active' : ''}`}
+                        onClick={() => { setBrushType('marker'); setIsEraser(false); setIsEyedropper(false); }}
+                        title="Marker"
+                      >
+                        <Pen size={20} />
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className={`tool-btn-floating ${!isEraser && !isEyedropper && brushType === 'spray' ? 'active' : ''}`}
+                        onClick={() => { setBrushType('spray'); setIsEraser(false); setIsEyedropper(false); }}
+                        title="Spray"
+                      >
+                        <Cloud size={20} />
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className={`tool-btn-floating ${isEraser ? 'active' : ''}`}
+                        onClick={() => { setIsEraser(true); setIsEyedropper(false); }}
+                        title="Eraser"
+                      >
+                        <Eraser size={20} />
+                      </motion.button>
+                    </div>
                   </div>
 
-                  <div className="toolbar-divider" />
+                  {/* Bottom Row: Slider + Utilities */}
+                  <div className="toolbar-row slider-row">
+                    <div className="toolbar-group slider-group">
+                      <div className="brush-dot-preview-mini" style={{ background: isEraser ? '#fff' : color, border: isEraser ? '2px solid #ccc' : 'none' }} />
+                      <input
+                        type="range"
+                        min="1"
+                        max="60"
+                        value={brushSize}
+                        onChange={(e) => setBrushSize(e.target.value)}
+                        className="canvas-brush-slider"
+                      />
+                      <span className="brush-size-label">{brushSize}px</span>
+                    </div>
 
-                  <div className="toolbar-group slider-group">
-                    <div className="brush-dot-preview-mini" style={{ background: isEraser ? '#fff' : color, border: isEraser ? '2px solid #ccc' : 'none' }} />
-                    <input
-                      type="range"
-                      min="1"
-                      max="60"
-                      value={brushSize}
-                      onChange={(e) => setBrushSize(e.target.value)}
-                      className="canvas-brush-slider"
-                    />
-                    <span className="brush-size-label">{brushSize}px</span>
-                  </div>
+                    <div className="toolbar-divider" />
 
-                  <div className="toolbar-divider" />
-
-                  <div className="toolbar-group utility">
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className={`tool-btn-floating ${isEyedropper ? 'active' : ''}`}
-                      onClick={() => { setIsEyedropper(true); setIsEraser(false); }}
-                      title="Color Picker"
-                    >
-                      <Pipette size={20} />
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="tool-btn-floating clear"
-                      onClick={clearCanvas}
-                      title="Clear Canvas"
-                    >
-                      <Trash2 size={20} />
-                    </motion.button>
+                    <div className="toolbar-group utility">
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className={`tool-btn-floating ${isEyedropper ? 'active' : ''}`}
+                        onClick={() => { setIsEyedropper(true); setIsEraser(false); }}
+                        title="Color Picker"
+                      >
+                        <Pipette size={20} />
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="tool-btn-floating clear"
+                        onClick={clearCanvas}
+                        title="Clear Canvas"
+                      >
+                        <Trash2 size={20} />
+                      </motion.button>
+                    </div>
                   </div>
                 </div>
               </div>

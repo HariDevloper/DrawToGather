@@ -262,14 +262,14 @@ body,
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
 }
 
-.color-dot-small.selected {
+.color-dot-small.active {
     transform: scale(1.1) !important;
     border-color: #2C2C2C !important;
     border-width: 4px !important;
     box-shadow: 0 0 0 3px rgba(255, 217, 61, 0.6), 0 4px 15px rgba(0, 0, 0, 0.25) !important;
 }
 
-.color-dot-small.selected::after {
+.color-dot-small.active::after {
     border-color: rgba(255, 217, 61, 0.8) !important;
 }
 
@@ -500,6 +500,46 @@ body,
     gap: 12px !important;
 }
 
+/* Canvas Bottom Toolbar Base */
+.canvas-bottom-toolbar-container {
+    position: absolute !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 100 !important;
+    pointer-events: auto !important;
+}
+
+.canvas-bottom-toolbar {
+    display: flex !important;
+    align-items: center !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    padding: 8px 15px !important;
+    border: 4px solid #FFD93D !important;
+    border-radius: 30px !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+    gap: 15px !important;
+}
+
+.toolbar-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+}
+
+.toolbar-divider {
+    width: 2px !important;
+    height: 30px !important;
+    background: #FFD93D !important;
+    opacity: 0.5 !important;
+}
+
+.desktop-only {
+    display: block !important;
+}
+
+
 /* ===== RESPONSIVENESS ===== */
 
 /* Tablet & Smaller Desktops */
@@ -519,7 +559,18 @@ body,
 @media (max-width: 900px) {
     .top-bar {
         height: 60px !important;
-        padding: 0 15px !important;
+        padding: 0 10px !important;
+        justify-content: space-between !important;
+    }
+
+    .brand-logo {
+        display: none !important;
+    }
+
+    .top-stats {
+        flex: 1 !important;
+        justify-content: flex-start !important;
+        gap: 8px !important;
     }
 
     .logo {
@@ -627,6 +678,11 @@ body,
         padding-bottom: 20px !important;
     }
 
+    .sidebar-section {
+        padding: 10px 10px 40px 10px !important;
+        /* Extra bottom space */
+    }
+
     .sidebar-section.chat-section {
         height: 100% !important;
     }
@@ -645,49 +701,75 @@ body,
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
     }
 
-    /* Ultra-Compact Toolbar */
+    /* Two-Line Toolbar for Mobile */
     .canvas-bottom-toolbar-container {
-        margin-top: 5px !important;
+        margin-top: 10px !important;
+        position: static !important;
+        transform: none !important;
         width: 100% !important;
         display: flex !important;
         justify-content: center !important;
+        padding: 0 10px !important;
     }
 
     .canvas-bottom-toolbar {
-        padding: 4px 8px !important;
-        gap: 6px !important;
+        flex-direction: column !important;
+        padding: 10px !important;
+        gap: 12px !important;
         border-width: 3px !important;
-        border-radius: 20px !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        border-radius: 25px !important;
+        width: 100% !important;
+        max-width: 300px !important;
+        margin-bottom: 10px !important;
+    }
+
+    .toolbar-row {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    /* Row specific spacing */
+    .slider-row {
+        gap: 10px !important;
+    }
+
+    .toolbar-divider {
+        height: 20px !important;
+        margin: 0 !important;
+    }
+
+    .desktop-only {
+        display: none !important;
     }
 
     .tool-btn-floating {
-        width: 32px !important;
-        height: 32px !important;
+        width: 36px !important;
+        height: 36px !important;
     }
 
     .tool-btn-floating svg {
-        width: 16px !important;
-        height: 16px !important;
+        width: 18px !important;
+        height: 18px !important;
     }
 
     .canvas-brush-slider {
-        width: 60px !important;
+        flex: 1 !important;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 100px !important;
     }
 
     .brush-size-label {
-        font-size: 0.7rem !important;
-        min-width: 25px !important;
+        font-size: 0.75rem !important;
+        min-width: 35px !important;
     }
 
     .brush-dot-preview-mini {
         width: 12px !important;
         height: 12px !important;
-    }
-
-    .toolbar-divider {
-        height: 20px !important;
-        margin: 0 2px !important;
     }
 
     /* BOTTOM FIXED NAVIGATION */

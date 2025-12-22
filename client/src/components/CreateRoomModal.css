@@ -34,6 +34,11 @@
     font-family: 'Poppins', sans-serif;
     outline: none;
     transition: all 0.2s;
+    color: #2C2C2C !important;
+}
+
+.form-section input[type="text"]::placeholder {
+    color: #999 !important;
 }
 
 .form-section input[type="text"]:focus {
@@ -170,6 +175,7 @@
     background: white;
     font-size: 1rem;
     font-weight: 700;
+    color: #2C2C2C;
     cursor: pointer;
     transition: all 0.2s;
 }
