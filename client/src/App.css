@@ -1602,23 +1602,24 @@ body {
 /* 334px Lobby Specifics */
 @media (max-width: 350px) {
   .party-title {
-    font-size: 1.1rem !important;
+    font-size: 0.95rem !important;
     letter-spacing: 0 !important;
   }
 
   .party-face {
-    font-size: 1.2rem !important;
-    margin-bottom: 5px !important;
+    font-size: 1rem !important;
+    margin-bottom: 3px !important;
   }
 
   .lobby-party-hero {
-    padding: 5px 0 !important;
+    padding: 2px 0 !important;
     transform: scale(0.9) !important;
+    margin-bottom: 5px !important;
   }
 
   .lobby-rooms-section h2 {
-    font-size: 1rem !important;
-    margin-bottom: 10px !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 8px !important;
   }
 
   .lobby-action-buttons {

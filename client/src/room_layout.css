@@ -628,15 +628,13 @@ body,
         height: 100dvh !important;
         display: flex !important;
         flex-direction: column !important;
-        overflow-y: auto !important;
-        /* Allow small scroll give */
+        overflow: hidden !important;
         padding-bottom: 75px !important;
-        /* Fixed Nav space */
     }
 
     .room-main-container {
         flex: 1 !important;
-        min-height: 100% !important;
+        height: 100% !important;
         display: block !important;
         position: relative !important;
         overflow: hidden !important;
@@ -659,11 +657,12 @@ body,
     .mobile-active-canvas .room-canvas-area {
         display: flex !important;
         flex-direction: column !important;
-        justify-content: flex-start !important;
-        /* Start from top */
-        padding-bottom: 150px !important;
-        /* Extra room for toolbar + nav */
-        overflow-y: auto !important;
+        justify-content: center !important;
+        /* Centered canvas */
+        align-items: center !important;
+        padding: 10px !important;
+        padding-bottom: 100px !important;
+        /* Enough for toolbar */
     }
 
     .mobile-active-chat .room-left-sidebar {
@@ -700,12 +699,22 @@ body,
     }
 
     .canvas-frame {
-        width: 100% !important;
-        height: auto !important;
+        width: 95vw !important;
+        height: 95vw !important;
+        /* Force square */
         max-width: 100% !important;
+        max-height: 50dvh !important;
+        /* Don't take too much vertical space */
         aspect-ratio: 1/1 !important;
-        border-width: 6px !important;
+        border-width: 4px !important;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+        margin: 0 auto !important;
+    }
+
+    .canvas-frame canvas {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
     }
 
     /* Two-Line Toolbar for Mobile */
@@ -719,15 +728,16 @@ body,
         padding: 0 10px !important;
     }
 
+    /* Wide & Perfect Toolbar Buttons */
     .canvas-bottom-toolbar {
         flex-direction: column !important;
-        padding: 10px !important;
-        gap: 12px !important;
+        width: 95% !important;
+        max-width: 340px !important;
+        padding: 8px !important;
+        gap: 8px !important;
         border-width: 3px !important;
-        border-radius: 25px !important;
-        width: 100% !important;
-        max-width: 300px !important;
-        margin-bottom: 10px !important;
+        border-radius: 20px !important;
+        margin-bottom: 5px !important;
     }
 
     .toolbar-row {
@@ -735,12 +745,13 @@ body,
         width: 100% !important;
         justify-content: center !important;
         align-items: center !important;
-        gap: 8px !important;
+        gap: 6px !important;
     }
 
     /* Row specific spacing */
     .slider-row {
-        gap: 10px !important;
+        justify-content: space-between !important;
+        padding: 0 5px !important;
     }
 
     .toolbar-divider {
@@ -752,9 +763,19 @@ body,
         display: none !important;
     }
 
+    .brushes {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        width: 100% !important;
+        gap: 6px !important;
+    }
+
     .tool-btn-floating {
-        width: 36px !important;
-        height: 36px !important;
+        width: 100% !important;
+        /* Fill grid */
+        height: 34px !important;
+        border-radius: 10px !important;
+        /* Rectangular/Wide */
     }
 
     .tool-btn-floating svg {
@@ -766,7 +787,7 @@ body,
         flex: 1 !important;
         width: auto !important;
         min-width: 0 !important;
-        max-width: 100px !important;
+        max-width: 120px !important;
     }
 
     .brush-size-label {
@@ -778,6 +799,16 @@ body,
         width: 12px !important;
         height: 12px !important;
     }
+
+    .utility {
+        gap: 6px !important;
+    }
+
+    .utility .tool-btn-floating {
+        width: 40px !important;
+        /* Square for utility is fine if wide brushes */
+    }
+
 
     /* BOTTOM FIXED NAVIGATION */
     .mobile-room-nav {

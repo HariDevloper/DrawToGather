@@ -54,6 +54,7 @@ function App() {
     const savedUser = localStorage.getItem('user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
+  const [selectedBaseColor, setSelectedBaseColor] = useState(DEFAULT_COLOR_PALETTE[0]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showSocial, setShowSocial] = useState(false);
@@ -1269,9 +1270,10 @@ function App() {
                         key={c}
                         whileHover={{ scale: 1.15 }}
                         whileTap={{ scale: 0.9 }}
-                        className={`color-dot-small ${color === c ? 'active' : ''}`}
+                        className={`color-dot-small ${selectedBaseColor === c ? 'active' : ''}`}
                         style={{ backgroundColor: c }}
                         onClick={() => {
+                          setSelectedBaseColor(c);
                           setColor(c);
                           setColorShades(generateColorShades(c));
                           setIsEraser(false);
@@ -1290,14 +1292,8 @@ function App() {
                         const x = e.clientX - rect.left;
                         const percentage = x / rect.width;
 
-                        // Get the base color from palette
-                        const baseColor = colorPalette.find(c => {
-                          const shades = generateColorShades(c);
-                          return shades.includes(color);
-                        }) || color;
-
-                        // Generate shade based on click position
-                        const shades = generateColorShades(baseColor);
+                        // Use the state-tracked base color
+                        const shades = generateColorShades(selectedBaseColor);
                         const index = Math.round(percentage * (shades.length - 1));
                         const selectedShade = shades[Math.max(0, Math.min(index, shades.length - 1))];
 
@@ -1309,23 +1305,16 @@ function App() {
                       <div
                         className="shade-gradient-bar"
                         style={{
-                          background: `linear-gradient(to right, ${generateColorShades(colorPalette.find(c => {
-                            const shades = generateColorShades(c);
-                            return shades.includes(color);
-                          }) || color).join(', ')})`
+                          background: `linear-gradient(to right, ${generateColorShades(selectedBaseColor).join(', ')})`
                         }}
                       >
                         <div
                           className="shade-selector"
                           style={{
                             left: (() => {
-                              const baseColor = colorPalette.find(c => {
-                                const shades = generateColorShades(c);
-                                return shades.includes(color);
-                              }) || color;
-                              const shades = generateColorShades(baseColor);
+                              const shades = generateColorShades(selectedBaseColor);
                               const index = shades.indexOf(color);
-                              return `${(index / (shades.length - 1)) * 100}%`;
+                              return index >= 0 ? `${(index / (shades.length - 1)) * 100}%` : '0%';
                             })()
                           }}
                         />
@@ -1348,6 +1337,8 @@ function App() {
               >
                 <canvas
                   ref={canvasRef}
+                  width={VIRTUAL_SIZE}
+                  height={VIRTUAL_SIZE}
                   onMouseDown={startDrawing}
                   onMouseUp={finishDrawing}
                   onMouseMove={handleMouseMove}
