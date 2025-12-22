@@ -628,14 +628,15 @@ body,
         height: 100dvh !important;
         display: flex !important;
         flex-direction: column !important;
-        overflow: hidden !important;
+        overflow-y: auto !important;
+        /* Allow small scroll give */
         padding-bottom: 75px !important;
         /* Fixed Nav space */
     }
 
     .room-main-container {
         flex: 1 !important;
-        height: 100% !important;
+        min-height: 100% !important;
         display: block !important;
         position: relative !important;
         overflow: hidden !important;
@@ -658,15 +659,21 @@ body,
     .mobile-active-canvas .room-canvas-area {
         display: flex !important;
         flex-direction: column !important;
-        justify-content: center !important;
+        justify-content: flex-start !important;
+        /* Start from top */
+        padding-bottom: 150px !important;
+        /* Extra room for toolbar + nav */
+        overflow-y: auto !important;
     }
 
     .mobile-active-chat .room-left-sidebar {
         display: block !important;
+        padding-bottom: 120px !important;
     }
 
     .mobile-active-tools .room-right-sidebar {
         display: block !important;
+        padding-bottom: 120px !important;
     }
 
     /* Sidebar adjustments */

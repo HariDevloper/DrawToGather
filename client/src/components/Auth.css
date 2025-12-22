@@ -176,18 +176,28 @@
         padding: 25px 15px !important;
     }
 
+    .auth-brand h1 {
+        font-size: 1.5rem !important;
+    }
+
+    .brand-icon-box {
+        width: 40px !important;
+        height: 40px !important;
+        margin-bottom: 15px !important;
+    }
+
     .auth-welcome h2 {
-        font-size: 1.8rem !important;
+        font-size: 1.6rem !important;
     }
 
     .auth-welcome p {
-        font-size: 1rem !important;
-        margin-bottom: 25px !important;
+        font-size: 0.9rem !important;
+        margin-bottom: 20px !important;
     }
 
     .google-btn-container-bold {
         width: 100% !important;
         justify-content: center !important;
-        scale: 0.9 !important;
+        scale: 0.85 !important;
     }
 }

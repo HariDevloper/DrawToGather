@@ -1537,7 +1537,19 @@ body {
     flex: 1 !important;
     overflow-y: auto !important;
     width: 100% !important;
-    padding: 15px !important;
+    padding: 15px 15px 110px 15px !important;
+    /* Huge bottom padding for fixed nav items */
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .lobby-main-content,
+  .lobby-social-panel {
+    display: none !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    width: 100% !important;
+    padding: 10px 10px 140px 10px !important;
+    /* Extremely high bottom padding for action buttons */
     -webkit-overflow-scrolling: touch !important;
   }
 
@@ -1548,6 +1560,16 @@ body {
   .lobby-active-social .lobby-social-panel {
     display: block !important;
     background: #FFF9E6 !important;
+  }
+
+  .lobby-rooms-grid {
+    gap: 10px !important;
+    padding-bottom: 20px !important;
+  }
+
+  .lobby-action-buttons {
+    margin-top: 20px !important;
+    padding-bottom: 20px !important;
   }
 
   /* Bottom Nav for Lobby - FIXED */
@@ -1580,19 +1602,23 @@ body {
 /* 334px Lobby Specifics */
 @media (max-width: 350px) {
   .party-title {
-    font-size: 1.5rem !important;
+    font-size: 1.1rem !important;
+    letter-spacing: 0 !important;
   }
 
   .party-face {
-    font-size: 1.5rem !important;
+    font-size: 1.2rem !important;
+    margin-bottom: 5px !important;
   }
 
   .lobby-party-hero {
-    padding: 10px 0 !important;
+    padding: 5px 0 !important;
+    transform: scale(0.9) !important;
   }
 
   .lobby-rooms-section h2 {
-    font-size: 1.1rem !important;
+    font-size: 1rem !important;
+    margin-bottom: 10px !important;
   }
 
   .lobby-action-buttons {
@@ -1601,6 +1627,76 @@ body {
 
   .lobby-action-btn {
     padding: 8px 12px !important;
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Global Modal Shrinker for Mobile */
+@media (max-width: 600px) {
+
+  .modal-content,
+  .profile-modal-content,
+  .reward-modal-content,
+  .create-room-modal,
+  .export-modal,
+  .onboarding-card {
+    width: 95% !important;
+    padding: 12px !important;
+    max-height: 85vh !important;
+    border-radius: 20px !important;
+    margin: 10px auto !important;
+  }
+
+  /* Specific fix for floating notifications */
+  .notifications-panel {
+    width: 94% !important;
+    left: 3% !important;
+    top: 65px !important;
+    right: 3% !important;
+    border-radius: 20px !important;
+    max-height: 70vh !important;
+  }
+
+  .modal-header h2,
+  .export-header h2,
+  .reward-header h2,
+  .profile-header h2 {
+    font-size: 1.1rem !important;
+  }
+
+  .modal-body,
+  .create-room-content {
+    padding: 10px !important;
+  }
+
+  .modal-actions,
+  .export-actions {
+    margin-top: 15px !important;
+    padding-top: 10px !important;
+    gap: 10px !important;
+  }
+
+  .modal-actions button,
+  .export-btn {
+    padding: 10px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .streak-grid {
+    gap: 8px !important;
+  }
+
+  .streak-day {
+    padding: 8px 4px !important;
+  }
+
+  .day-label {
+    font-size: 0.65rem !important;
+  }
+
+  .coin-circle {
+    width: 22px !important;
+    height: 22px !important;
     font-size: 0.8rem !important;
   }
 }
