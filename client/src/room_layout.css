@@ -642,6 +642,52 @@ body,
         max-width: 100% !important;
         aspect-ratio: 1/1 !important;
         border-width: 6px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* Ultra-Compact Toolbar */
+    .canvas-bottom-toolbar-container {
+        margin-top: 5px !important;
+        width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+    }
+
+    .canvas-bottom-toolbar {
+        padding: 4px 8px !important;
+        gap: 6px !important;
+        border-width: 3px !important;
+        border-radius: 20px !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .tool-btn-floating {
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    .tool-btn-floating svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    .canvas-brush-slider {
+        width: 60px !important;
+    }
+
+    .brush-size-label {
+        font-size: 0.7rem !important;
+        min-width: 25px !important;
+    }
+
+    .brush-dot-preview-mini {
+        width: 12px !important;
+        height: 12px !important;
+    }
+
+    .toolbar-divider {
+        height: 20px !important;
+        margin: 0 2px !important;
     }
 
     /* BOTTOM FIXED NAVIGATION */
@@ -701,11 +747,6 @@ body,
     .stat-pill {
         width: 32px !important;
         height: 32px !important;
-    }
-
-    .canvas-bottom-toolbar {
-        scale: 0.8 !important;
-        transform-origin: bottom center !important;
     }
 
     .mobile-nav-item span {
