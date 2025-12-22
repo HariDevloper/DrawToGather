@@ -749,32 +749,7 @@ body {
   user-select: none;
 }
 
-/* --- Canvas Stage Container --- */
-.canvas-stage-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 100px 40px;
-  z-index: 2;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-}
-
-.canvas-stage {
-  background: white;
-  width: 800px;
-  height: 800px;
-  max-width: 85vh;
-  max-height: 85vh;
-  aspect-ratio: 1/1;
-  border: 8px solid var(--yellow-primary);
-  border-radius: 20px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-  position: relative;
-  overflow: hidden;
-}
+/* Legacy Canvas Styles Removed for Room Refactor */
 
 .drawing-canvas {
   width: 100% !important;
@@ -1457,26 +1432,92 @@ body {
   }
 }
 
-/* Portrait Mobile Rotation Guard */
+/* Mobile Vertical Optimization (Lobby) */
 @media (max-width: 600px) and (orientation: portrait) {
-  .app-container> :not(.top-bar) {
+  .lobby-container {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    gap: 20px !important;
+  }
+
+  .lobby-social-panel {
+    display: none !important;
+    /* Hide social panel on mobile portrait to focus on rooms */
+  }
+
+  .party-title {
+    font-size: 2.5rem !important;
+  }
+
+  .lobby-header-actions {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .lobby-action-btn {
+    width: 100% !important;
+  }
+
+  .lobby-action-buttons {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .lobby-big-btn {
+    width: 100% !important;
+  }
+
+  .lobby-grid {
+    grid-template-columns: 1fr !important;
+    overflow-y: visible !important;
+  }
+
+  .lobby-rooms-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .lobby-header h1 {
+    font-size: 1.8rem !important;
+  }
+
+  /* Top Bar Actions Collapse */
+  .top-stats {
+    gap: 5px !important;
+  }
+
+  .stat-pill span {
+    display: none !important;
+    /* Hide credit/name text, keep icons */
+  }
+
+  .stat-pill {
+    padding: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    justify-content: center !important;
+  }
+
+  .action-btn {
+    padding: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+  }
+
+  .action-btn span {
     display: none !important;
   }
 
-  body::before {
-    content: "🔄 Please rotate your device to landscape for the best experience!" !important;
-    position: fixed !important;
-    inset: 0 !important;
-    background: #FFF9E6 !important;
-    color: #2C2C2C !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-    padding: 40px !important;
-    font-weight: 900 !important;
-    font-size: 1.5rem !important;
-    z-index: 10000 !important;
+  .action-btn svg {
+    margin: 0 !important;
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .room-name-display {
+    display: none !important;
+    /* Hide room ID in small top bar */
   }
 }
 

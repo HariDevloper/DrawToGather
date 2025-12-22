@@ -955,7 +955,7 @@ function App() {
                 onClick={() => setShowInviteModal(true)}
               >
                 <Users size={18} />
-                Invite
+                <span>Invite</span>
               </motion.button>
 
               <motion.button
@@ -979,7 +979,7 @@ function App() {
                 onClick={handleLeaveRoom}
               >
                 <LogOut size={18} />
-                Leave
+                <span>Leave</span>
               </motion.button>
 
               <div className="music-player-nav-wrap">
