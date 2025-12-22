@@ -1028,14 +1028,12 @@ function App() {
               onClick={() => setLobbyActiveTab('main')}
             >
               <Home size={20} />
-              <span>Rooms</span>
             </button>
             <button
               className={`mobile-nav-item ${lobbyActiveTab === 'social' ? 'active' : ''}`}
               onClick={() => setLobbyActiveTab('social')}
             >
               <Users size={20} />
-              <span>Friends</span>
             </button>
           </div>
 
@@ -1230,21 +1228,18 @@ function App() {
               onClick={() => setMobileActiveTab('canvas')}
             >
               <Pencil size={20} />
-              <span>Canvas</span>
             </button>
             <button
               className={`mobile-nav-item ${mobileActiveTab === 'chat' ? 'active' : ''}`}
               onClick={() => setMobileActiveTab('chat')}
             >
               <MessageSquare size={20} />
-              <span>Chat</span>
             </button>
             <button
               className={`mobile-nav-item ${mobileActiveTab === 'tools' ? 'active' : ''}`}
               onClick={() => setMobileActiveTab('tools')}
             >
               <Zap size={20} />
-              <span>Tools</span>
             </button>
           </div>
 

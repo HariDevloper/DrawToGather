@@ -1522,11 +1522,13 @@ body {
 
   /* Lobby Switching Logic */
   .lobby-container {
-    height: calc(100dvh - 80px) !important;
+    height: 100dvh !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
     position: relative !important;
+    padding-bottom: 75px !important;
+    /* Space for fixed nav */
   }
 
   .lobby-main-content,
@@ -1536,6 +1538,7 @@ body {
     overflow-y: auto !important;
     width: 100% !important;
     padding: 15px !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
   .lobby-active-main .lobby-main-content {
@@ -1547,17 +1550,30 @@ body {
     background: #FFF9E6 !important;
   }
 
-  /* Bottom Nav for Lobby */
+  /* Bottom Nav for Lobby - FIXED */
   .mobile-lobby-nav {
-    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
     height: 70px !important;
     background: white !important;
     border-top: 4px solid #FFD93D !important;
+    display: flex !important;
     justify-content: space-around !important;
     align-items: center !important;
-    z-index: 1000 !important;
-    order: 2 !important;
-    /* Move to bottom */
+    z-index: 9999 !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+  }
+
+  /* Hide Nav Text per User Request */
+  .mobile-lobby-nav .mobile-nav-item span {
+    display: none !important;
+  }
+
+  .mobile-lobby-nav .mobile-nav-item svg {
+    width: 24px !important;
+    height: 24px !important;
   }
 }
 
