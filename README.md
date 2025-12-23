@@ -119,7 +119,7 @@ MIT License - feel free to use this project for learning or personal use.
 
 ## Author
 
-Created with ❤️ by MAHESH DAVID
+Created by HariDevloper 2025
 
 ---
 
