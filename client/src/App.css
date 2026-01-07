@@ -42,7 +42,9 @@ body {
   align-items: center !important;
   margin-bottom: 40px !important;
 }
-
+.mobile-lobby-nav {
+  display: none;
+}
 .lobby-header-actions {
   display: flex !important;
   gap: 15px !important;
