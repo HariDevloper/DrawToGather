@@ -159,3 +159,82 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* Mobile fixes */
+@media (max-width: 600px) {
+    .room-chat-container {
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .chat-panel {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .chat-messages {
+        flex: 1 !important;
+        overflow: visible !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 8px !important;
+        height: auto !important;
+        min-height: auto !important;
+    }
+
+    .chat-input-container {
+        flex-shrink: 0 !important;
+        padding: 8px !important;
+        padding-bottom: 8px !important;
+        margin: 0 !important;
+        background: white !important;
+        border-top: 2px solid #FFD93D !important;
+    }
+
+    .chat-input {
+        height: 32px !important;
+        font-size: 0.8rem !important;
+        padding: 6px 10px !important;
+        margin: 0 !important;
+    }
+
+    .chat-send-btn {
+        width: 32px !important;
+        height: 32px !important;
+        margin: 0 !important;
+    }
+
+    .message-content {
+        font-size: 0.8rem !important;
+        padding: 6px 10px !important;
+    }
+
+    .message-header {
+        font-size: 0.7rem !important;
+    }
+
+    /* Remove extra space under containers and make unscrollable */
+    .chat-container-fixed,
+    .members-container-fixed {
+        padding: 0 !important;
+        margin: 0 !important;
+        padding-bottom: 0 !important;
+        overflow: visible !important;
+        height: auto !important;
+    }
+
+    .sidebar-section.chat-section,
+    .sidebar-section.members-section {
+        padding: 8px !important;
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+        overflow: visible !important;
+        height: auto !important;
+    }
+}

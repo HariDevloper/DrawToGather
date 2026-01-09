@@ -41,7 +41,7 @@ function App() {
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState('#000000');
   const [colorShades, setColorShades] = useState(generateColorShades('#000000'));
-  const [brushSize, setBrushSize] = useState(5);
+  const [brushSize, setBrushSize] = useState(30);
   const [brushType, setBrushType] = useState('pencil'); // 'pencil', 'marker', 'spray'
   const [isEraser, setIsEraser] = useState(false);
   const [isEyedropper, setIsEyedropper] = useState(false);

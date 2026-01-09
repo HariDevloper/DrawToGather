@@ -28,12 +28,13 @@
 .form-section input[type="text"] {
     width: 100%;
     padding: 15px 20px;
-    border: 3px solid #eee;
+    border: 3px solid #FFD93D;
     border-radius: 15px;
     font-size: 1.1rem;
     font-family: 'Poppins', sans-serif;
     outline: none;
     transition: all 0.2s;
+    background: white;
     color: #2C2C2C !important;
 }
 
@@ -42,8 +43,9 @@
 }
 
 .form-section input[type="text"]:focus {
-    border-color: #FFD93D;
-    box-shadow: 0 0 0 3px rgba(255, 217, 61, 0.1);
+    border-color: #FF9A3D;
+    background: #FFFBEA;
+    box-shadow: 0 0 0 3px rgba(255, 217, 61, 0.2);
 }
 
 .privacy-toggle {
@@ -59,23 +61,24 @@
     justify-content: center;
     gap: 10px;
     padding: 15px 20px;
-    border: 3px solid #eee;
+    border: 3px solid #FFD93D;
     border-radius: 15px;
     background: white;
     font-size: 1rem;
     font-weight: 600;
+    color: #2C2C2C;
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
 }
 
 .privacy-btn:hover {
-    border-color: #FFD93D;
+    border-color: #FF9A3D;
     background: #FFFBEA;
 }
 
 .privacy-btn.active {
-    border-color: #FFD93D;
+    border-color: #FF9A3D;
     background: #FFF4A3;
     color: #2C2C2C;
 }
